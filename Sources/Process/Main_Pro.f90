@@ -237,24 +237,23 @@
     end do
   end if
 
-  ! Save initial results
-  curr_dt = 0
-  call Results % Main_Results(curr_dt, last_dt, time, n_dom,  &
-                              Flow, Turb, Vof, Swarm, exit_now)
+  ! Good time to call user function for beginning of simulation
+  do d = 1, n_dom
+    call User_Mod_Beginning_Of_Simulation(Flow(d), Turb(d),  &
+                                          Vof(d), Swarm(d),  &
+                                          first_dt, time)
+  end do
+
+  ! Save initial condition
+  do d = 1, n_dom
+    call Results % Main_Results(curr_dt, last_dt, time, n_dom,  &
+                                Flow(d), Turb(d), Vof(d), Swarm(d), exit_now)
+  end do
 
   !-------------------------------------!
   !   The time loop really begins now   !
   !-------------------------------------!
   do curr_dt = first_dt + 1, last_dt
-
-    ! Good time to call user function for beginning of simulation
-    if(curr_dt .eq. first_dt + 1) then
-      do d = 1, n_dom
-        call User_Mod_Beginning_Of_Simulation(Flow(d), Turb(d),  &
-                                              Vof(d), Swarm(d),  &
-                                              curr_dt, time)
-      end do
-    end if
 
 
     !------------------------------------!
