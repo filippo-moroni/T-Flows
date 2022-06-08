@@ -255,7 +255,6 @@
   !-------------------------------------!
   do curr_dt = first_dt + 1, last_dt
 
-
     !------------------------------------!
     !   Preparations for new time step   !
     !------------------------------------!
@@ -339,6 +338,8 @@
 
         call Piso_Algorithm(Flow(d), Turb(d), Vof(d), Sol(d), curr_dt, ini)
 
+        call Flow(d) % Calculate_Fluxes(Flow(d) % v_flux % n)
+
         ! Deal with turbulence (if you dare ;-))
         call Turb(d) % Main_Turb(Sol(d), curr_dt, ini)
 
@@ -380,7 +381,6 @@
 1   continue
 
     do d = 1, n_dom
-      call Flow(d) % Calculate_Fluxes(Flow(d) % v_flux % n)
       call Convective_Outflow(Flow(d), Turb(d), Vof(d), curr_dt)
     end do
 
@@ -422,8 +422,10 @@
     !----------------------!
     !   Save the results   !
     !----------------------!
-    call Results % Main_Results(curr_dt, last_dt, time, n_dom,  &
-                                Flow, Turb, Vof, Swarm, exit_now)
+    do d = 1, n_dom
+      call Results % Main_Results(curr_dt, last_dt, time, n_dom,  &
+                                  Flow(d), Turb(d), Vof(d), Swarm(d), exit_now)
+    end do
 
     ! Ran more than a set wall clock time limit
     if(Info_Mod_Time_To_Exit() .or. exit_now) then
