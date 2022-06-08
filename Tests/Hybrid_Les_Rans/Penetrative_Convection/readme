@@ -1,0 +1,42 @@
+Problem
+
+The problem with simulating penetrative convection stems from the fact that the
+SIMPLE method for linking velocities and pressures is terrible when it comes to
+building up a hydrostatic ("hydro" is a bit of a misnomer here, since we work
+with air, but you get the point) pressure field and the velocity field develops
+as an artifact of the iteration procedure, rather than physical processes.
+
+As an illustration, a test case in Tests/Laminar/Cavity/Hydrostatic/ shows that
+the algorithms in T-Flows are capable of achieving a steady hydrostatic sitation
+but it takes special tolerances for solvers and algorithm and it works only for
+constant density, linear variation of pressure, orthogonal grids.  Similar case
+is also simulated in Tests/Vof/Menciger_And_Zun, with large density variations.
+
+Realizing deficiencies of the SIMPLE algorithm for buidling up the hydrostatic
+pressure, other improvements have been proposed; SIMPLER by Patankar (1980) and
+SIMPLEC by Van Doormal and Raithby (1984), however, their implementation on
+cell-centered grids is not very straightforward as pointed out by Pascau (2011),
+we don't have them in T-Flows, and it is questionable to which extent would they
+aleviate the situation, given the non-linear distribution of hydro-static
+pressure and non-uniform grid.
+
+Solution
+
+To overcome this issue, an approach is taken in which the hydrostatic forces are
+computed at the beginning of the simulation, and are substracted from body
+forces at each time step, thus effectivelly eliminating the need to build the
+pressure up with the SIMPLE algorithm. Practically it is done as outlined below.
+
+At the beginning of simulation, a stably stratified temperature profile (colder
+at the lower boundary) is prescribed, and physical properties are updated based.
+You can see the implementation in User_Mod/Beginning_Of_Simulation.f90). These
+density variations create a certain hydrostatic pressure, and its build-up is
+not left to SIMPLE, as it creates artificial velocities as a result of iterative
+procedure.  Instead, the hydrostatic forces are computed with a call to 
+Flow % Buoyancy_Forces, stil in User_Mod/Beginning_Of_Simulation.f90.  These
+forces are stored in static_cell_fx, static_cell_fy, and static_cell_fz arrays
+defined in User_Mod/Types.f90.  During the solution procedure, a call to
+User_Mod_Forces is done from Compute_Momentum, where hydrostatic forces are
+substracted from the total body forces.  By doing so, the pressure we are
+computing in the algorithm is not the full pressure, but dynamic pressure minus
+the static pressure.
