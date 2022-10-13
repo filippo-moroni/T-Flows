@@ -27,6 +27,7 @@
   real                     :: g_d, g_u, alfa, beta1, beta2 
   real                     :: phi_f_c, phi_f_u
   real                     :: phij, phi_u, phi_star, rj, sign, gamma_c, beta
+  real                     :: denom
 !==============================================================================!
 !
 !               Flux > 0
@@ -80,7 +81,13 @@
 
   phi_u = max( phi_min(c), min(phi_star, phi_max(c)) )
 
-  rj = ( phi % n(c) - phi_u ) / ( phi % n(d) - phi % n(c) + 1.0e-16 )
+  !rj = ( phi % n(c) - phi_u ) / ( phi % n(d) - phi % n(c) + 1.0e-16 )
+  denom = phi % n(d) - phi % n(c)
+  if ( dabs (denom) < FEMTO ) then
+    denom = denom + dsign(FEMTO,denom) ! to avoid changing sign
+  endif
+  rj = ( phi % n(c) - phi_u ) / denom
+
 
   g_d = 0.5 * fj * (1.0+fj)
   g_u = 0.5 * fj * (1.0-fj)
@@ -89,7 +96,12 @@
     phij = fj
 
   else if(phi % adv_scheme .eq. QUICK) then
-    rj = ( phi % n(c) - phi_u ) / ( phi % n(d) - phi % n(c) + 1.0e-12 )
+    !rj = ( phi % n(c) - phi_u ) / ( phi % n(d) - phi % n(c) + 1.0e-12 )
+    denom = phi % n(d) - phi % n(c)
+    if ( dabs (denom) < FEMTO ) then
+      denom = denom + dsign(FEMTO,denom) ! to avoid changing sign
+    endif
+    rj = ( phi % n(c) - phi_u ) / denom
     alfa = 0.0
     phij = (g_d - alfa) + (g_u + alfa) * rj
 
