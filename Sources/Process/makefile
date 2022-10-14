@@ -72,13 +72,14 @@ ifeq ($(FORTRAN), intel)
   endif
   ifeq ($(DEBUG), yes)
     OPT_F_COMP = -module $(DIR_MODULE) -O0 -g -warn all -check all \
-                 -debug all -fpe-all=0 -traceback
+		 -debug all -fpe-all=0 -traceback -CB
   else
-    OPT_F_COMP = -module $(DIR_MODULE) -O3
+	OPT_F_COMP = -module $(DIR_MODULE) -O2
   endif
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
   endif
+OPT_F_COMP += -fpp -fpe:0
 
 # Fortran == nvidia
 else ifeq ($(FORTRAN), nvidia)
@@ -143,7 +144,11 @@ OPT_LINK = $(OPT_F_COMP)
 # Use here your command for mpi fortran compiler:
 ifeq ($(MPI), yes)
   ifeq ($(FCOMP),)
-    FC = mpif90
+    ifeq ($(FORTRAN), intel)
+      FC = mpiifort
+    else
+      FC = mpif90
+    endif
   else
     FC = $(FCOMP)
   endif
@@ -163,7 +168,7 @@ endif
 #--------------------
 ifneq ($(DIR_CASE), no)
   ifeq ('$(wildcard $(DIR_CASE))','')
-    $(info Case directory $(DIR_CASE) does not exist!)
+    $(error Case directory $(DIR_CASE) does not exist!)
   else
     $(info Compling for the case in $(DIR_CASE))
     ifeq ('$(wildcard $(DIR_CASE)/$(DIR_USER))','')
@@ -316,18 +321,21 @@ MOD = $(SRC_F_MOD_LOW:%.f90=$(DIR_MODULE)/%.mod)
 
 # Fortran modules
 $(DIR_OBJECT)/%.o: %.f90 %/*.f90
-	@echo $(FC) $<
-	@$(FC) $(OPT_F_COMP) -c -o $@ $<
+#	@echo $(FC) $<
+#	@$(FC) $(OPT_F_COMP) -c -o $@ $<
+	$(FC) $(OPT_F_COMP) -c -o $@ $<
 
 # Fortran functions
 $(DIR_OBJECT)/%.o: %.f90
-	@echo $(FC) $<
-	@$(FC) $(OPT_F_COMP) -c -o $@ $<
+#	@echo $(FC) $<
+#	@$(FC) $(OPT_F_COMP) -c -o $@ $<
+	$(FC) $(OPT_F_COMP) -c -o $@ $<
 
 # C functions
 $(DIR_OBJECT)/%.o: %.c
-	@echo $(CC) $<
-	@$(CC) $(OPT_C_COMP) -c -o $@ $<
+#	@echo $(CC) $<
+#	@$(CC) $(OPT_C_COMP) -c -o $@ $<
+	$(CC) $(OPT_C_COMP) -c -o $@ $<
 
 #-----------------------------------
 #   Rule to build main program
