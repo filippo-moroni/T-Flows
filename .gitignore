@@ -7,6 +7,7 @@
 *.map
 *.real
 *.mod
+*_genmod.f90
 *.cgns
 *.vtu
 *.com
