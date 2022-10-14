@@ -12,7 +12,7 @@
   type(Var_Type),    target :: phi
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer  :: Grid
-  integer                   :: s, c, c1, c2, iter
+  integer                   :: s, c, c1, c2, iter, i
   real                      :: res, norm
   real, contiguous, pointer :: phi_f_n(:), phi_f_o(:)
 !==============================================================================!
@@ -36,7 +36,11 @@
   do iter = 1, Flow % gauss_miter
 
     ! Save the old iteration
-    phi_f_o(:) = phi_f_n(:)
+    !phi_f_o(:) = phi_f_n(:)  ! intel compiler (debug) doesn't allow
+    !do i=1,size(phi_f_n)
+    do i= 1, Grid % n_faces
+      phi_f_o(i) = phi_f_n(i)
+    enddo
 
     ! Estimate values at faces from the
     ! values in cells and last gradients
