@@ -23,9 +23,9 @@
     write(time_info % lines(2)(67:72),  '(i6)')    n
 
     ! Write simulation time
-    write(time_info % lines(4)(45:61),    '(a17)')  'Simulation time :'
-    write(time_info % lines(4)(63:71), '(1pe9.3)')  sim_time
-    write(time_info % lines(4)(73:83),     '(a3)')  '[s]'
+    write(time_info % lines(4)(45:61),     '(a17)')  'Simulation time :'
+    write(time_info % lines(4)(63:72), '(1pe10.3)')  sim_time
+    write(time_info % lines(4)(74:76),      '(a3)')  '[s]'
 
     ! Write wall-clock time
     write(time_info % lines(5)(45:61), '(a17)') 'Wall-clock time :'
@@ -34,7 +34,7 @@
     seconds = floor(  wall_time - 3600.0 * hours - 60.0 * minutes )
     write(time_info % lines(5)(63:65), '(i3.3)')  hours
     write(time_info % lines(5)(66:66),   '(a1)')  ':'
-    write(time_info % lines(5)(67:69), '(i2.2)')  minutes
+    write(time_info % lines(5)(67:68), '(i2.2)')  minutes
     write(time_info % lines(5)(69:69),   '(a1)')  ':'
     write(time_info % lines(5)(70:71), '(i2.2)')  seconds
     write(time_info % lines(5)(73:83),  '(a11)') '[hhh:mm:ss]'
