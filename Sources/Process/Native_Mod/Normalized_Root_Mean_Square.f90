@@ -37,11 +37,12 @@
   call Comm_Mod_Global_Max_Real(x_max)
 
   ! Create a plateau for very small sources and values
-  if( (x_max-x_min) < NANO .and. rms < NANO ) then
-    rms = PICO
-  else
-    rms = rms / (x_max - x_min + TINY)
-  end if
+  !if( (x_max-x_min) < NANO .and. rms < NANO ) then
+  !  rms = PICO
+  !else
+  !  rms = rms / (x_max - x_min + TINY)
+  !end if
+  rms = rms / (x_max - x_min + TINY)
 
   Normalized_Root_Mean_Square = rms
 
