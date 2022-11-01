@@ -45,7 +45,7 @@
   !                                                      ! 
   !   First level comments are written like sentences,   ! 
   !   first word capital, and can spread over several    !
-  !   lines like this very commet.                       !
+  !   lines like this very comment.                      !
   !                                                      !
   !------------------------------------------------------!
 

@@ -33,6 +33,7 @@
   real                       :: grav_i, p_drop_i
   real                       :: ui_si, ui_di
   real, contiguous,  pointer :: cross(:)
+  real                       :: tau_k1, tau_k2, tau_k3  !---------------------------------------------------------------------------------------------YVES
 !------------------------------------------------------------------------------!
 !                                                                              !
 !  Stress tensor on the face s:                                                !
@@ -233,6 +234,30 @@
       f_im = ui_di * m0
 
       ! Cross diffusion part
+      
+!------------------------------------------------------------------------------------------------------------------------------------
+
+      if(i .eq. 1) then
+        tau_k1 = Grid % fw(s) * nlin_stress % x (c1) + (1.0-Grid % fw(s)) * nlin_stress % x (c2)
+        tau_k2 = Grid % fw(s) * nlin_stress % xy(c1) + (1.0-Grid % fw(s)) * nlin_stress % xy(c2)
+        tau_k3 = Grid % fw(s) * nlin_stress % xz(c1) + (1.0-Grid % fw(s)) * nlin_stress % xz(c2)
+      end if
+      if(i .eq. 2) then
+        tau_k1 = Grid % fw(s) * nlin_stress % yx(c1) + (1.0-Grid % fw(s)) * nlin_stress % yx(c2)
+        tau_k2 = Grid % fw(s) * nlin_stress % y (c1) + (1.0-Grid % fw(s)) * nlin_stress % y (c2)
+        tau_k3 = Grid % fw(s) * nlin_stress % yz(c1) + (1.0-Grid % fw(s)) * nlin_stress % yz(c2)
+      end if
+      if(i .eq. 3) then
+        tau_k1 = Grid % fw(s) * nlin_stress % zx(c1) + (1.0-Grid % fw(s)) * nlin_stress % zx(c2)
+        tau_k2 = Grid % fw(s) * nlin_stress % zy(c1) + (1.0-Grid % fw(s)) * nlin_stress % zy(c2)
+        tau_k3 = Grid % fw(s) * nlin_stress % z (c1) + (1.0-Grid % fw(s)) * nlin_stress % z (c2)
+      end if
+      f_stress =  - (  tau_k1 * Grid % sx(s)  &
+                     + tau_k2 * Grid % sy(s)  &
+                     + tau_k3 * Grid % sz(s) )
+
+!------------------------------------------------------------------------------------------------------------------------------------
+      
       cross(c1) = cross(c1) + f_ex - f_im + f_stress * Flow % density(c1)
       if(c2  > 0) then
         cross(c2) = cross(c2) - f_ex + f_im - f_stress * Flow % density(c2)

@@ -30,6 +30,55 @@
   real,    pointer, contiguous :: save_04(:), save_05(:), save_06(:)
   real,    pointer, contiguous :: var_ins(:)
   real,    pointer, contiguous :: v2_calc(:), kin_vis_t(:), phi_save(:)
+  
+  
+  
+!---------------------------------------------------------------------------------------------------------------------------------------------------------------------DANGER: STARTING YVES ZONE (1/2)
+  
+  type SnapShot	! Hay que definir un nuevo Type, con vectores para las coordenadas, la velocidad, y la presión. Cuando tengamos recogida la información para todos los 	
+  		! subdominios (en Files distintos, uno por cada procesador), UNO de los procesadores se encargará de recopilarla toda en estos vectores; así, tendremos
+  		! la coordenada "x" de CADA celda del dominio en un sólo vector, la "y" en otro, la presión en otro, &c.
+
+    ! Los vectores individuales que queremos:
+    real, allocatable :: u_snap(:), v_snap(:), w_snap(:), p_snap(:)		  ! Streamwise, Vertical, and Spanwise VELOCITY in the Cell ; Pressure in the Cell
+    real, allocatable :: x_snap(:), y_snap(:), z_snap(:)			  ! "x", "y", and "z" position of the Cell
+    
+    real, allocatable :: dudx_snap(:), dudy_snap(:), dudz_snap(:)		  ! "x", "y", and "z" GRADIENTS of Streamwise Velocity
+    real, allocatable :: dvdx_snap(:), dvdy_snap(:), dvdz_snap(:)		  ! "x", "y", and "z" GRADIENTS of Vertical Velocity
+    real, allocatable :: dwdx_snap(:), dwdy_snap(:), dwdz_snap(:)		  ! "x", "y", and "z" GRADIENTS of Spanwise Velocity
+    
+    integer, allocatable :: puesto(:)			  ! Position of the Cell in the ordered Single Vector
+    
+    real,    allocatable :: equis2(:)			  ! "x" coordinate of the Cell. ¡¡NECESARY!! Otherwise "z_snap" would be ordered differently after Sorting
+    real,    allocatable :: ygriega2(:)			  ! "y" coordinate of the Cell. ¡¡NECESARY!! Otherwise "z_snap" would be ordered differently after Sorting
+    real,    allocatable :: ceta2(:)			  ! "z" coordinate of the Cell. ¡¡NECESARY!! Otherwise "z_snap" would be ordered differently after Sorting
+    
+  end type
+  
+  type(SnapShot) :: Snap		! Creamos nuestra variable "Snap", del tipo "SnapShot
+  
+  ! Ahora algunas variables locales:
+  integer :: turb_interval2 = 1430	! Intervalo de recogida de SnapShots (INPUT)
+  integer :: IniTurb = 253110		! Primer TS en el que se recogen SnapShots (INPUT)
+  integer :: ene = 0			! Número de TS que han pasado desde el primer TS en el que se recogen SnapShots
+  
+  integer :: i = 0			! Un contador
+  integer :: j = 0			! Un contador
+  
+  integer :: n_of_cells = 1200000	! Número de Cells del dominio completo; IMPORTANTE aproximar POR LO ALTO, ya que se usa para alocar espacio en los vectores. (INPUT)
+  
+  character(len=1024) :: filename	! Nombre del File que queremos abrir o cerrar.
+  
+  integer :: n_c_tot = 0  		! Contador del número total de Cells; lo primero que hace el procesador ÚNICO es abrir los Files individuales de cada subdominio
+  					! e ir construyendo los vectores ÚNICOS con los valores que lée; llevar la cuenta de cuántas Cells llevas leídas es necesario
+  					! para poner cada Cell detrás del anterior, especialmente cuando cambias de la última de un subdominio a la primera de otro
+  
+  integer :: Nceta = 37  		! Número de celdas a lo largo de la dirección homogénea "z"
+  					
+!-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ENDING YVES ZONE (1/2)
+
+
+
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: PLOT_BUFFERS = .false.  ! .true. is good for debugging
 !==============================================================================!
@@ -415,6 +464,206 @@
                                       f8, f9, data_offset, run)
     end if
 
+
+
+!---------------------------------------------------------------------------------------------------------------------------------------------------------------------DANGER: STARTING YVES ZONE (2/2)
+
+  ene = ts - IniTurb											! Check how many TSs have past since the one where we started to gather SnapShots
+  
+!----------------------------------------------------------------------------------------------------------------------------------------For SPECTRA
+
+!adsf
+
+!---------------------------------------------------------------------------------------------------------------------------------------------------------------------DANGER: STARTING YVES ZONE (2/2)
+!--------------------------------------------------------------------------------------------------------------------------------------------------------------------GENERAL SNAPSHOTS:
+  
+  if(ene > -1 .and. mod(ene, turb_interval2) < 1 .and. run .eq. 1 .and. plot_inside) then		! If we HAVE started to gather SnapShots, and this is a TS where we're supposed to
+  													! save one, do so, but only once (in Run 1) and only for 3D Cells (plot_inside):
+  
+    if (this_proc < 10) write (filename, "(A8,I1,A4)") "SnapShot", this_proc, '.txt'			  ! The name of the SUBsnapshot file...
+    if (this_proc > 9) write (filename, "(A8,I2,A4)") "SnapShot", this_proc, '.txt'			  ! ...is "SnapShot(ProcessorNumber).txt"
+  
+    open(unit=606+this_proc,file = trim(filename),form='formatted',status='unknown')			  ! So go ahead and create the file...
+  
+    do i = c_f, c_l											  ! ...and for every Cell of the SubDomain...
+      if (Grid % vol(i) > 0.000000000001) then								    ! ...(every 3D Cell, that is)...
+        write (606+this_proc, *) Grid % xc(i),  &		 					      ! ...write a row of the file containing its "x" Coordinate,...
+        								     Grid % yc(i),  &		      ! ..."y" Coordinate,...
+        								     Grid % zc(i),  &		      ! ..."z" Coordinate,...
+        								  Flow % u % n(i),  &		      ! ...Streamwise Velocity,...
+        								  Flow % v % n(i),  &		      ! ...Vertical Velocity,...
+        								  Flow % w % n(i),  &		      ! ...Spanwise Velocity,...
+        								  Flow % p % n(i),  &		      ! ...and Pressure...
+        								  Flow % u % x(i),  &		      ! asdf
+        								  Flow % u % y(i),  &		      ! asdf
+        								  Flow % u % z(i),  &		      ! asdf
+        								  Flow % v % x(i),  &		      ! asdf
+        								  Flow % v % y(i),  &		      ! asdf
+        								  Flow % v % z(i),  &		      ! asdf
+        								  Flow % w % x(i),  &		      ! asdf
+        								  Flow % w % y(i),  &		      ! asdf
+        								  Flow % w % z(i)		      ! asdf
+      end if												    ! (END "if 3D Cell")
+    end do												  ! (END "for every Cell of the SubDomain")
+    
+    close(606+this_proc)										  ! ...then close the file and go on with the module
+    
+  end if												! [END "If we HAVE started to gather SnapShots, and this is a TS where (...)]"
+
+  
+  
+  if(ene > -1 .and. mod(ene, turb_interval2) < 1 .and. run .eq. 2  &					! Now, if we HAVE started to gather SnapShots, and this is a TS where we're supposed to
+  	   .and. this_proc .eq. n_proc .and. .not. plot_inside) then					! save one, AND we've already gathered the data about every Cell of every SubDomain
+													! ([last part (.not. plot_inside) of the last Run (Run 2)], then use ONLY ONE PROCESSOR
+													! (n_proc) to read through the individual files and join all info in a SINGLE SnapShot:
+												
+    allocate(Snap % u_snap(n_of_cells));  Snap % u_snap = 0.						  !  Start by allocating space for every "Single Vector". We haven't counted...
+    allocate(Snap % v_snap(n_of_cells));  Snap % v_snap = 0.						  !  ...exactly how many Cells are in the whole domain yet (because we'll do...
+    allocate(Snap % w_snap(n_of_cells));  Snap % w_snap = 0.						  !  ...it WHILE we build the vectors), so for the allocation we'll use the...
+    allocate(Snap % p_snap(n_of_cells));  Snap % p_snap = 0.						  !  ...rough estimate that we provided earlier as INPUT; "n_of_cells".
+    allocate(Snap % x_snap(n_of_cells));  Snap % x_snap = 0.						  !  ------------------------------------------------------------------
+    allocate(Snap % y_snap(n_of_cells));  Snap % y_snap = 0.						  !  ------------------------------------------------------------------
+    allocate(Snap % z_snap(n_of_cells));  Snap % z_snap = 0.						  !  ------------------------------------------------------------------
+    allocate(Snap % dudx_snap(n_of_cells));  Snap % dudx_snap = 0.					  !  ------------------------------------------------------------------
+    allocate(Snap % dudy_snap(n_of_cells));  Snap % dudy_snap = 0.					  !  ------------------------------------------------------------------
+    allocate(Snap % dudz_snap(n_of_cells));  Snap % dudz_snap = 0.					  !  ------------------------------------------------------------------
+    allocate(Snap % dvdx_snap(n_of_cells));  Snap % dvdx_snap = 0.					  !  ------------------------------------------------------------------
+    allocate(Snap % dvdy_snap(n_of_cells));  Snap % dvdy_snap = 0.					  !  ------------------------------------------------------------------
+    allocate(Snap % dvdz_snap(n_of_cells));  Snap % dvdz_snap = 0.					  !  ------------------------------------------------------------------
+    allocate(Snap % dwdx_snap(n_of_cells));  Snap % dwdx_snap = 0.					  !  ------------------------------------------------------------------
+    allocate(Snap % dwdy_snap(n_of_cells));  Snap % dwdy_snap = 0.					  !  ------------------------------------------------------------------
+    allocate(Snap % dwdz_snap(n_of_cells));  Snap % dwdz_snap = 0.					  !  --------------------------------------------------------------------------
+  
+    do j = 1, n_proc											  ! Then, for every SUBsnapshot...
+    
+      if (j < 10) write (filename, "(A8,I1,A4)") "SnapShot", j, '.txt'					    ! ...[whose names, again, are...
+      if (j > 9) write (filename, "(A8,I2,A4)") "SnapShot", j, '.txt'					    ! ..."SnapShot(ProcessorNumber).txt"]...
+  
+      open(unit=606+j,file = trim(filename),form='formatted',status='unknown')				    ! ...go ahead and open the SUBfile:
+
+      do												    ! For every ROW* of the SUBfile, we're going to...
+      					
+	    read (606+j,*, end=10) Snap % x_snap(n_c_tot+1),     &					      ! ...read the "x" coordinate,...
+				   Snap % y_snap(n_c_tot+1),     &					      ! ..."y" coordinate,...
+				   Snap % z_snap(n_c_tot+1),     &					      ! ..."z" Coordinate,...
+				   Snap % u_snap(n_c_tot+1),     &					      ! ...Streamwise Velocity,...
+				   Snap % v_snap(n_c_tot+1),     &					      ! ...Vertical Velocity,...
+				   Snap % w_snap(n_c_tot+1),     &					      ! ...Spanwise Velocity,...
+				   Snap % p_snap(n_c_tot+1),     &					      ! ...and Pressure, of the corresponding CELL.
+				   Snap % dudx_snap(n_c_tot+1),  &					      ! asdf
+				   Snap % dudy_snap(n_c_tot+1),  &					      ! asdf
+				   Snap % dudz_snap(n_c_tot+1),  &					      ! asdf
+				   Snap % dvdx_snap(n_c_tot+1),  &					      ! asdf
+				   Snap % dvdy_snap(n_c_tot+1),  &					      ! asdf
+				   Snap % dvdz_snap(n_c_tot+1),  &					      ! asdf
+				   Snap % dwdx_snap(n_c_tot+1),  &					      ! asdf
+				   Snap % dwdy_snap(n_c_tot+1),  &					      ! asdf
+				   Snap % dwdz_snap(n_c_tot+1)						      ! asdf
+				   
+	    n_c_tot = n_c_tot + 1									      ! Also, we have to add the Cell to our total (EXACT) Count.
+	    
+      end do												    ! (END "for every ROW of the SUBfile")
+
+      10 close (606+j, status='delete')									    ! *: Since we couldn't know how many rows there were in the SUBfile beforehand,
+      								!we couldn't specify a counter to determine the end of the "do" cycle; instead, we told the program "end=10", which means
+      								! "go to '10' when you reach the end of the SUBfile. Well, '10' is THIS LINE, so when we reach the end of the SUBfile during
+      								! the "do" cycle (which means that we're done reading it), we delete the SUBfile and go on
+    
+    end do												  ! (END "for every SUBsnapshot")
+  
+    ! Now that we've read (and deleted) every SUBsnapshot -and consequently built the whole "Single Vectors"-, we go ahead
+    ! and write the FULL Snapshot, starting by ordering the Single Vectors by the Cells' distance to origin and "z" coordinate:
+    
+    allocate(Snap % puesto(n_c_tot)); Snap % puesto = 0.
+    allocate(Snap % equis2(n_c_tot)); Snap % equis2 = 0.
+    allocate(Snap % ygriega2(n_c_tot)); Snap % ygriega2 = 0.
+    allocate(Snap % ceta2(n_c_tot)); Snap % ceta2 = 0.
+
+    Snap % equis2(:) = HUGE
+    Snap % ygriega2(:) = HUGE
+    
+    do i = 1, n_c_tot
+      Snap % puesto(i) = i
+      Snap % equis2(i) = min(Snap % equis2(i),  &
+                     Snap % x_snap(i))
+      Snap % ygriega2(i) = min(Snap % ygriega2(i),  &
+                     Snap % y_snap(i))
+      Snap % ceta2(i) = Snap % z_snap(i)
+    end do
+    
+  call Sort % Three_Real_Carry_Int(Snap % equis2, Snap % ygriega2, Snap % ceta2, Snap % puesto)		! <------(This is the function that will do the sorting for us)										
+    
+    select case(ts)											  ! We then set the NAME of the SnapShot, with the same syntax as
+    													  ! the vtu's (because it looks cool). To get that, we condition
+    													  ! the format depending on the OoM of the TS at which we are:
+      case (0:9)
+        write (filename, "(A16,I1,A4)") "SnapShot-ts00000", ts, '.txt'
+      case (10:99)
+        write (filename, "(A15,I2,A4)") "SnapShot-ts0000", ts, '.txt'
+      case (100:999)
+        write (filename, "(A14,I3,A4)") "SnapShot-ts000", ts, '.txt'
+      case (1000:9999)
+        write (filename, "(A13,I4,A4)") "SnapShot-ts00", ts, '.txt'
+      case (10000:99999)
+        write (filename, "(A12,I5,A4)") "SnapShot-ts0", ts, '.txt'
+      case default
+        write (filename, "(A11,I6,A4)") "SnapShot-ts", ts, '.txt'
+    end select
+
+    open(unit=607,file = trim(filename),form='formatted',status='unknown')				  ! So yet another time, let's go ahead and create the file...
+    
+    do i = 1, n_c_tot											  ! ...and, for every Cell in the WHOLE Domain...
+      
+      write (607, *) Snap % x_snap(Snap % puesto(i)), ',',     &					    ! ...write a row of the file containing its "x" Coordinate,...
+        	     Snap % y_snap(Snap % puesto(i)), ',',     &					    ! ..."y" Coordinate,...
+        	     Snap % z_snap(Snap % puesto(i)), ',',     &					    ! ..."z" Coordinate,...
+          	     Snap % u_snap(Snap % puesto(i)), ',',     &					    ! ...Streamwise Velocity,...
+        	     Snap % v_snap(Snap % puesto(i)), ',',     &					    ! ...Vertical Velocity,...
+        	     Snap % w_snap(Snap % puesto(i)), ',',     &					    ! ...Spanwise Velocity,...
+        	     Snap % p_snap(Snap % puesto(i)), ',',     &					    ! ...and Pressure:
+		     Snap % dudx_snap(Snap % puesto(i)), ',',  &					    ! asdf
+		     Snap % dudy_snap(Snap % puesto(i)), ',',  &					    ! asdf
+		     Snap % dudz_snap(Snap % puesto(i)), ',',  &					    ! asdf
+		     Snap % dvdx_snap(Snap % puesto(i)), ',',  &					    ! asdf
+		     Snap % dvdy_snap(Snap % puesto(i)), ',',  &					    ! asdf
+		     Snap % dvdz_snap(Snap % puesto(i)), ',',  &					    ! asdf
+		     Snap % dwdx_snap(Snap % puesto(i)), ',',  &					    ! asdf
+		     Snap % dwdy_snap(Snap % puesto(i)), ',',  &					    ! asdf
+		     Snap % dwdz_snap(Snap % puesto(i))							    ! asdf
+        								     
+    end do												  ! (END "for every Cell in the WHOLE Domain")
+    
+    deallocate(Snap % u_snap)										  ! And we're pretty much done; all there's left is to deallocate the...
+    deallocate(Snap % v_snap)										  ! ...space that we reserved for the "Single Vectors" (because we don't...
+    deallocate(Snap % w_snap)										  ! ...need them anymore, since we've already saved the corresponding...
+    deallocate(Snap % p_snap)										  ! ...information in the SNAPSHOT),...
+    deallocate(Snap % x_snap)										  ! -----------------------------------
+    deallocate(Snap % y_snap)										  ! -----------------------------------
+    deallocate(Snap % z_snap)										  ! -----------------------------------
+    deallocate(Snap % puesto)										  ! -----------------------------------
+    deallocate(Snap % equis2)										  ! -----------------------------------
+    deallocate(Snap % ygriega2)										  ! -----------------------------------
+    deallocate(Snap % ceta2)										  !  ------------------------------------------------------------------
+    deallocate(Snap % dudx_snap)									  !  ------------------------------------------------------------------
+    deallocate(Snap % dudy_snap)									  !  ------------------------------------------------------------------
+    deallocate(Snap % dudz_snap)									  !  ------------------------------------------------------------------
+    deallocate(Snap % dvdx_snap)									  !  ------------------------------------------------------------------
+    deallocate(Snap % dvdy_snap)									  !  ------------------------------------------------------------------
+    deallocate(Snap % dvdz_snap)									  !  ------------------------------------------------------------------
+    deallocate(Snap % dwdx_snap)									  !  ------------------------------------------------------------------
+    deallocate(Snap % dwdy_snap)									  !  ------------------------------------------------------------------
+    deallocate(Snap % dwdz_snap)									  !  --------------------------------------------------------------------------
+      
+    close(607)												  ! ...close the SnapShot File,...
+
+    n_c_tot = 0;											  ! ...and, FINALLY reset the Exact Cell Counter to 0 (not sure if it's needed)
+
+  end if												! [END "if we HAVE started to (...) in a SINGLE SnapShot"]
+  
+!-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ENDING YVES ZONE (2/2)
+
+
+
     !--------------!
     !   Velocity   !
     !--------------!
@@ -655,11 +904,17 @@
 !                                        plot_inside,                        &
 !                                        Turb % p_t2(c_f:c_l),               &
 !                                        f8, f9, data_offset, run)
-        call Results % Save_Vector_Real("Turbulent Heat Flux [K m/s]",     &
-                                        plot_inside,                       &
-                                        Turb % ut % n(c_f:c_l),            &
-                                        Turb % vt % n(c_f:c_l),            &
-                                        Turb % wt % n(c_f:c_l),            &
+        call Results % Save_Scalar_Real("Turbulent Heat Flux X [K m/s]",     &
+                                        plot_inside,                         &
+                                        Turb % ut % n(c_f:c_l),              &
+                                        f8, f9, data_offset, run)
+        call Results % Save_Scalar_Real("Turbulent Heat Flux Y [K m/s]",     &
+                                        plot_inside,                         &
+                                        Turb % vt % n(c_f:c_l),              &
+                                        f8, f9, data_offset, run)
+        call Results % Save_Scalar_Real("Turbulent Heat Flux Z [K m/s]",     &
+                                        plot_inside,                         &
+                                        Turb % wt % n(c_f:c_l),              &
                                         f8, f9, data_offset, run)
 !        call Results % Save_Scalar_Real("Turbulent Quantity Alpha L",     &
 !                                        plot_inside,                      &
@@ -723,21 +978,42 @@
     ! Reynolds stress models
     if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
        Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-      call Results % Save_Tensor_6_Real("Reynolds Stress [m^2/s^2]",  &
-                                        plot_inside,                  &
-                                        Turb % uu % n(c_f:c_l),       &
-                                        Turb % vv % n(c_f:c_l),       &
-                                        Turb % ww % n(c_f:c_l),       &
-                                        Turb % uv % n(c_f:c_l),       &
-                                        Turb % vw % n(c_f:c_l),       &
-                                        Turb % uw % n(c_f:c_l),       &
-                                        f8, f9, data_offset, run)
+      call Results % Save_Scalar_Real("Reynolds Stress XX [m^2/s^2]",  &
+                                      plot_inside,                     &
+                                      Turb % uu % n(c_f:c_l),          &
+                                      f8, f9, data_offset, run)
+      call Results % Save_Scalar_Real("Reynolds Stress YY [m^2/s^2]",  &
+                                      plot_inside,                     &
+                                      Turb % vv % n(c_f:c_l),          &
+                                      f8, f9, data_offset, run)
+      call Results % Save_Scalar_Real("Reynolds Stress ZZ [m^2/s^2]",  &
+                                      plot_inside,                     &
+                                      Turb % ww % n(c_f:c_l),          &
+                                      f8, f9, data_offset, run)
+      call Results % Save_Scalar_Real("Reynolds Stress XY [m^2/s^2]",  &
+                                      plot_inside,                     &
+                                      Turb % uv % n(c_f:c_l),          &
+                                      f8, f9, data_offset, run)
+      call Results % Save_Scalar_Real("Reynolds Stress XZ [m^2/s^2]",  &
+                                      plot_inside,                     &
+                                      Turb % uw % n(c_f:c_l),          &
+                                      f8, f9, data_offset, run)
+      call Results % Save_Scalar_Real("Reynolds Stress YZ [m^2/s^2]",  &
+                                      plot_inside,                     &
+                                      Turb % vw % n(c_f:c_l),          &
+                                      f8, f9, data_offset, run)
       if(Flow % heat_transfer) then
-        call Results % Save_Vector_Real("Turbulent Heat Flux [K m/s]",  &
-                                        plot_inside,                    &
-                                        Turb % ut % n(c_f:c_l),         &
-                                        Turb % vt % n(c_f:c_l),         &
-                                        Turb % wt % n(c_f:c_l),         &
+        call Results % Save_Scalar_Real("Turbulent Heat Flux X [K m/s]",  &
+                                        plot_inside,                      &
+                                        Turb % ut % n(c_f:c_l),           &
+                                        f8, f9, data_offset, run)
+        call Results % Save_Scalar_Real("Turbulent Heat Flux Y [K m/s]",  &
+                                        plot_inside,                      &
+                                        Turb % vt % n(c_f:c_l),           &
+                                        f8, f9, data_offset, run)
+        call Results % Save_Scalar_Real("Turbulent Heat Flux Z [K m/s]",  &
+                                        plot_inside,                      &
+                                        Turb % wt % n(c_f:c_l),           &
                                         f8, f9, data_offset, run)
       end if
     end if
@@ -761,18 +1037,33 @@
         save_02(c1) = Turb % vv_res(c1) - Turb % v_mean(c1) * Turb % v_mean(c1)
         save_03(c1) = Turb % ww_res(c1) - Turb % w_mean(c1) * Turb % w_mean(c1)
         save_04(c1) = Turb % uv_res(c1) - Turb % u_mean(c1) * Turb % v_mean(c1)
-        save_05(c1) = Turb % vw_res(c1) - Turb % v_mean(c1) * Turb % w_mean(c1)
-        save_06(c1) = Turb % uw_res(c1) - Turb % u_mean(c1) * Turb % w_mean(c1)
+        save_05(c1) = Turb % uw_res(c1) - Turb % u_mean(c1) * Turb % w_mean(c1)
+        save_06(c1) = Turb % vw_res(c1) - Turb % v_mean(c1) * Turb % w_mean(c1)
       end do
-      call Results % Save_Tensor_6_Real("Mean Reynolds Stress [m^s/s^2]",  &
-                                        plot_inside,                       &
-                                        save_01(c_f:c_l),                  &
-                                        save_02(c_f:c_l),                  &
-                                        save_03(c_f:c_l),                  &
-                                        save_04(c_f:c_l),                  &
-                                        save_05(c_f:c_l),                  &
-                                        save_06(c_f:c_l),                  &
-                                        f8, f9, data_offset, run)
+      call Results % Save_Scalar_Real("Mean Reynolds Stress XX [m^s/s^2]",  &
+                                      plot_inside,                          &
+                                      save_01(c_f:c_l),                     &
+                                      f8, f9, data_offset, run)
+      call Results % Save_Scalar_Real("Mean Reynolds Stress YY [m^s/s^2]",  &
+                                      plot_inside,                          &
+                                      save_02(c_f:c_l),                     &
+                                      f8, f9, data_offset, run)
+      call Results % Save_Scalar_Real("Mean Reynolds Stress ZZ [m^s/s^2]",  &
+                                      plot_inside,                          &
+                                      save_03(c_f:c_l),                     &
+                                      f8, f9, data_offset, run)
+      call Results % Save_Scalar_Real("Mean Reynolds Stress XY [m^s/s^2]",  &
+                                      plot_inside,                          &
+                                      save_04(c_f:c_l),                     &
+                                      f8, f9, data_offset, run)
+      call Results % Save_Scalar_Real("Mean Reynolds Stress XZ [m^s/s^2]",  &
+                                      plot_inside,                          &
+                                      save_05(c_f:c_l),                     &
+                                      f8, f9, data_offset, run)
+      call Results % Save_Scalar_Real("Mean Reynolds Stress YZ [m^s/s^2]",  &
+                                      plot_inside,                          &
+                                      save_06(c_f:c_l),                     &
+                                      f8, f9, data_offset, run)
       if(Flow % heat_transfer) then
         call Results % Save_Scalar_Real("Mean Temperature [K]",           &
                                         plot_inside,                      &
@@ -792,11 +1083,17 @@
                                         plot_inside,                           &
                                         phi_save(c_f:c_l),                     &
                                         f8, f9, data_offset, run)
-        call Results % Save_Vector_Real("Mean Turbulent Heat Flux [K m/s]",  &
-                                        plot_inside,                         &
-                                        save_01(c_f:c_l),                    &
-                                        save_02(c_f:c_l),                    &
-                                        save_03(c_f:c_l),                    &
+        call Results % Save_Scalar_Real("Mean Turbulent Heat Flux X [K m/s]",  &
+                                        plot_inside,                           &
+                                        save_01(c_f:c_l),                      &
+                                        f8, f9, data_offset, run)
+        call Results % Save_Scalar_Real("Mean Turbulent Heat Flux Y [K m/s]",  &
+                                        plot_inside,                           &
+                                        save_02(c_f:c_l),                      &
+                                        f8, f9, data_offset, run)
+        call Results % Save_Scalar_Real("Mean Turbulent Heat Flux Z [K m/s]",  &
+                                        plot_inside,                           &
+                                        save_03(c_f:c_l),                      &
                                         f8, f9, data_offset, run)
       end if
 
