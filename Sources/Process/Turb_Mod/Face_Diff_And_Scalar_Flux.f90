@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Face_Diff_And_Stress(Turb, dif_eff, phi_stress, s, sc)
+  subroutine Face_Diff_And_Scalar_Flux(Turb, dif_eff, turb_phi_flux, s, sc)
 !------------------------------------------------------------------------------!
 !   Computes turbulent diffusivity on a cell face for all turbulence models.   !
 !   It is called from Compute_Scalar, while discretizing diffusion terms.      !
@@ -8,8 +8,8 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
   real                     :: dif_eff
-  real                     :: phi_stress
-  integer                  :: s
+  real                     :: turb_phi_flux
+  integer, intent(in)      :: s
   integer, intent(in)      :: sc
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
@@ -26,7 +26,7 @@
   Grid => Turb % pnt_grid
   phi  => Flow % scalar(sc)
 
-  phi_stress = 0.0
+  turb_phi_flux = 0.0
 
   c1 = Grid % faces_c(1,s)
   c2 = Grid % faces_c(2,s)
@@ -50,7 +50,7 @@
 
   if(Turb % model .eq. HYBRID_LES_RANS) then
     dif_turb = Grid % fw(s) * Turb % vis_t_eff(c1) / sc_t  &
-       + (1.0-Grid % fw(s)) * Turb % vis_t_eff(c2) / sc_t
+        + (1.0-Grid % fw(s)) * Turb % vis_t_eff(c2) / sc_t
   end if
 
   !-----------------------------------!
@@ -58,21 +58,25 @@
   !-----------------------------------!
   dif_eff = dif_mol + dif_turb
 
-  ! Effective diffusivity at walls
-  if(Turb % model .eq. K_EPS        .or.  &
-     Turb % model .eq. K_EPS_ZETA_F .or.  &
+  !-----------------------------------------------------------------------!
+  !   This part implements wall-function approach for the listed models   !
+  !-----------------------------------------------------------------------!
+  if(Turb % model .eq. K_EPS            .or.  &
+     Turb % model .eq. K_EPS_ZETA_F     .or.  &
+     Turb % model .eq. LES_SMAGORINSKY  .or.  &
+     Turb % model .eq. LES_DYNAMIC      .or.  &
+     Turb % model .eq. LES_WALE         .or.  &
+     Turb % model .eq. LES_TVM          .or.  &
      Turb % model .eq. HYBRID_LES_RANS) then
-    if(c2 < 0) then
-      if(Var_Mod_Bnd_Cond_Type(phi, c2) .eq. WALL .or.  &
-         Var_Mod_Bnd_Cond_Type(phi, c2) .eq. WALLFL) then
-        dif_eff = Turb % diff_w(c1)
-      end if
+    if(Var_Mod_Bnd_Cond_Type(phi, c2) .eq. WALL .or.  &
+       Var_Mod_Bnd_Cond_Type(phi, c2) .eq. WALLFL) then
+      dif_eff = Turb % diff_w(c1)
     end if
   end if
 
-  !---------------------------!
-  !   Turbulent scalar fluxes !
-  !---------------------------!
+  !-----------------------------!
+  !   Turbulent scalar fluxes   !
+  !-----------------------------!
 
   if(Turb % scalar_flux_model .eq. GGDH .or. &
      Turb % scalar_flux_model .eq. AFM) then
@@ -91,18 +95,16 @@
     wc_f =  (    Grid % fw(s)  * Turb % wc(c1) * Flow % density(c1)   &
          +  (1.0-Grid % fw(s)) * Turb % wc(c2) * Flow % density(c2))
 
-    phi_stress = - (  uc_f * Grid % sx(s)                      &
-                    + vc_f * Grid % sy(s)                      &
-                    + wc_f * Grid % sz(s) )                    &
-                  - (dif_turb * (  phix_f * Grid % sx(s)              &
-                                 + phiy_f * Grid % sy(s)              &
-                                 + phiz_f * Grid % sz(s)) )
+    turb_phi_flux = - (  uc_f * Grid % sx(s)                      &
+                       + vc_f * Grid % sy(s)                      &
+                       + wc_f * Grid % sz(s) )                    &
+                       - (dif_turb * (  phix_f * Grid % sx(s)     &
+                                      + phiy_f * Grid % sy(s)     &
+                                      + phiz_f * Grid % sz(s)) )
 
     if(Grid % cell_near_wall(c1).or.Grid % cell_near_wall(c2)) then
-      if( Turb % y_plus(c1) > 11.0 .or. Turb % y_plus(c2) > 11.0 ) then
-
-        phi_stress = 0.0
-
+      if( Turb % y_plus(c1) > 11.3 .or. Turb % y_plus(c2) > 11.3 ) then
+        turb_phi_flux = 0.0
       end if
     end if
 

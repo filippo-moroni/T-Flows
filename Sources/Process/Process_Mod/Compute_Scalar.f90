@@ -102,7 +102,7 @@
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
-    call Turb % Face_Diff_And_Stress(dif_eff, phi_stress, s, sc)
+    call Turb % Face_Diff_And_Scalar_Flux(dif_eff, phi_stress, s, sc)
 
     ! Gradients on the cell face
     phix_f = Grid % fw(s)*phi % x(c1) + (1.0-Grid % fw(s))*phi % x(c2)

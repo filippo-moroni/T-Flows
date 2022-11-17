@@ -147,8 +147,8 @@
       procedure :: Calculate_Scalar_Flux
       procedure :: Calculate_Mean
       procedure :: Calculate_Stress
-      procedure :: Face_Cond_And_Stress
-      procedure :: Face_Diff_And_Stress
+      procedure :: Face_Cond_And_Heat_Flux
+      procedure :: Face_Diff_And_Scalar_Flux
       procedure :: Face_Stress
       procedure :: Face_Vis
       procedure :: Substract_Face_Stress
@@ -285,8 +285,8 @@
 #   include "Turb_Mod/Calculate_Scalar_Flux.f90"
 #   include "Turb_Mod/Calculate_Mean.f90"
 #   include "Turb_Mod/Calculate_Stress.f90"
-#   include "Turb_Mod/Face_Cond_And_Stress.f90"
-#   include "Turb_Mod/Face_Diff_and_Stress.f90"
+#   include "Turb_Mod/Face_Cond_And_Heat_Flux.f90"
+#   include "Turb_Mod/Face_Diff_And_Scalar_Flux.f90"
 #   include "Turb_Mod/Face_Stress.f90"
 #   include "Turb_Mod/Face_Vis.f90"
 #   include "Turb_Mod/Substract_Face_Stress.f90"

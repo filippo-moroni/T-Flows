@@ -127,7 +127,7 @@
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
-    call Turb % Face_Cond_And_Stress(con_eff, t_stress, s)
+    call Turb % Face_Cond_And_Heat_Flux(con_eff, t_stress, s)
 
     if(Flow % mass_transfer) then
       if(Vof % fun % n(c1) < 0.5 .and.  &
