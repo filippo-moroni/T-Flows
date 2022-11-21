@@ -11,8 +11,8 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: A_POW = 8.3
-  integer, parameter :: B_POW = 1.0/7.0
+  real, parameter :: A_POW = 8.3
+  real, parameter :: B_POW = 1.0/7.0
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -134,8 +134,12 @@
         nu = Flow % viscosity(c1) / Flow % density(c1)
         dely = Grid % wall_dist(c1)
 
-        ! Calculate u_tau
-        u_tau = (u_tan/A_POW * (nu/dely)**B_POW) ** (1.0/(1.0+B_POW))
+        !------------------------------------------------------------!
+        !   Calculate u_tau according to Werner-Wengle formulation   !
+        !------------------------------------------------------------!
+        u_tau = ((1.0 + B_POW)/A_POW * (nu/dely)**B_POW * u_tan         &
+               + (1.0 - B_POW)*0.5 * (nu/dely)**(1.0 + B_POW)           &
+               * A_POW**((1.0+B_POW)/(1.0+B_POW)))**(1.0/(1.0 + B_POW))
 
         ! Calculate y+
         Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(    &
@@ -149,16 +153,23 @@
                                Turb % y_plus(c1),     &
                                z_o)
 
-        ! Effective viscosity above and below 11.18 threshold
-        if(Turb % y_plus(c1)  >=  11.81) then
-          Turb % vis_w(c1) = Flow % density(c1) * u_tau * u_tau * dely  &
-                           / abs(u_tan)
-        else
-          Turb % vis_w(c1) = Flow % viscosity(c1)                &
-                        +      Grid % fw(s)  * Turb % vis_t(c1)  &
-                        + (1.0-Grid % fw(s)) * Turb % vis_t(c2)
+        ebf = Turb % Ebf_Momentum(c1)
+
+        !----------------------------------------------------------!
+        !   In the laminar layer, set elliptic blending function   !
+        !   (Small value to recover molecular viscosity)           !
+        !----------------------------------------------------------!
+        if(Turb % y_plus(c1) < 11.3 ) then
+          ebf = MICRO
         end if
 
+        Turb % vis_w(c1) =    Turb % y_plus(c1) * Flow % viscosity(c1)  &
+                         / (  Turb % y_plus(c1) * exp(-1.0 * ebf)       &
+                            + u_plus * exp(-1.0/ebf) + TINY)
+
+        !-----------------------------!
+        !   For heat transfer cases   !
+        !-----------------------------!
         if(Flow % heat_transfer) then
           u_plus = u_tan / u_tau
 
@@ -175,6 +186,7 @@
           end if
 
           ebf = Turb % Ebf_Scalar(c1, pr)
+
           Turb % con_w(c1) =    Turb % y_plus(c1)                         &
                               * Flow % viscosity(c1)                      &
                               * Flow % capacity(c1)                       &
@@ -182,6 +194,9 @@
                          + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
         end if
 
+        !--------------------------!
+        !   For scalar transport   !
+        !--------------------------!
         if(Flow % n_scalars > 0) then
           u_plus = u_tan / u_tau
 
@@ -190,14 +205,14 @@
                * (1.0 + 0.28 * exp(-0.007*sc/sc_t))
 
           ! According to Toparlar et al. 2019 paper
-          ! "CFD simulation of the near-neutral atmospheric boundary layer: New
-          ! temperature inlet profile consistent with wall functions"
+          ! "CFD simulation of the near-neutral atmospheric boundary layer:
+          ! New temperature inlet profile consistent with wall functions"
           if(Turb % rough_walls) then
             beta = 0.0
           end if
 
-          ebf = 0.01 * (sc * Turb % y_plus(c1)**4                 &
-              / ((1.0 + 5.0 * sc**3 * Turb % y_plus(c1)) + TINY))
+          ebf = Turb % Ebf_Scalar(c1, sc)
+
           Turb % diff_w(c1) =  Turb % y_plus(c1)                  &
               * (Flow % viscosity(c1)/Flow % density(c1))         &
               / (Turb % y_plus(c1) * sc * exp(-1.0 * ebf)         &
