@@ -59,7 +59,8 @@
   dif_eff = dif_mol + dif_turb
 
   ! Effective diffusivity at walls
-  if(Turb % model .eq. K_EPS        .or.  &
+  if(Turb % Les()                   .or.  &
+     Turb % model .eq. K_EPS        .or.  &
      Turb % model .eq. K_EPS_ZETA_F .or.  &
      Turb % model .eq. HYBRID_LES_RANS) then
     if(c2 < 0) then
