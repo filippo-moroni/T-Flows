@@ -76,7 +76,8 @@
   con_eff = con_mol + con_turb
 
   ! Effective conductivity at walls
-  if(Turb % model .eq. K_EPS        .or.  &
+  if(Turb % Les()                   .or.  &
+     Turb % model .eq. K_EPS        .or.  &
      Turb % model .eq. K_EPS_ZETA_F .or.  &
      Turb % model .eq. HYBRID_LES_RANS) then
     if(c2 < 0) then
