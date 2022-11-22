@@ -100,6 +100,7 @@
       !   Procedures to be called by other modules   !
       !----------------------------------------------!
       procedure :: Calculate_Grad_Matrix_With_Front
+      procedure :: Extrapolate_Normal_To_Front
       procedure :: Get_Gas_And_Liquid_Phase
       procedure :: Grad_Component_No_Refresh_With_Front
       procedure :: Grad_Variable_With_Front
@@ -143,6 +144,7 @@
 #   include "Vof_Mod/Utilities/Get_Gas_And_Liquid_Phase.f90"
 #   include "Vof_Mod/Utilities/Grad_Component_No_Refresh_With_Front.f90"
 #   include "Vof_Mod/Utilities/Grad_Variable_With_Front.f90"
+#   include "Vof_Mod/Utilities/Extrapolate_Normal_To_Front.f90"
 #   include "Vof_Mod/Utilities/Mass_Transfer_Added_Volume.f90"
 #   include "Vof_Mod/Utilities/Mass_Transfer_Estimate.f90"
 #   include "Vof_Mod/Utilities/Mass_Transfer_Pressure_Source.f90"

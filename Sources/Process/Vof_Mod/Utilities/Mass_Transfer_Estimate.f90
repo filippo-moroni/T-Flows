@@ -11,13 +11,18 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
-  integer                   :: e, g, l, s, c1, c2, i_ele
+  type(Front_Type), pointer :: Front
+  integer                   :: c, e, g, l, s, c1, c2, i_ele
   real                      :: cond_1, cond_2
+  type(Var_Type)            :: t_0, t_1  ! introduced to hold gradients in
+                                         ! each of the phases, needed for
+                                         ! estimation of mass transfer in cells
 !==============================================================================!
 
   ! Take aliases
-  Grid => Vof % pnt_grid
-  Flow => Vof % pnt_flow
+  Grid  => Vof % pnt_grid
+  Flow  => Vof % pnt_flow
+  Front => Vof % Front
 
   ! If not a problem with mass transfer, get out of here
   if(.not. Flow % mass_transfer) return
@@ -25,7 +30,7 @@
   ! Initialize mass transfer term
   Vof % m_dot(:) = 0.0
 
-  ! Distinguish between liquid and vapor
+  ! Distinguish between liquid and vapor (Yohei doesn't like)
   call Vof % Get_Gas_And_Liquid_Phase(g, l)
 
   !------------------------------------------------!
@@ -35,60 +40,29 @@
   call Vof % Calculate_Grad_Matrix_With_Front()
   call Vof % Grad_Variable_With_Front(Flow % t, Vof % t_sat)
 
-  !----------------------------------------!
-  !   Compute heat flux at the interface   !
-  !----------------------------------------!
-  do s = 1, Grid % n_faces
+  ! First extrapolate temperature gradients from phase 0 to 1
+  call Vof % Extrapolate_Normal_To_Front(Flow, t_1, towards=1)
 
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
+  ! Then extrapolate temperature gradients from phase 1 to 0
+  call Vof % Extrapolate_Normal_To_Front(Flow, t_0, towards=0)
 
-    if(any(Vof % Front % elems_at_face(1:2,s) .ne. 0)) then
+  !--------------------------------------------------!
+  !   Compute heat flux at the interface cell-wise   !
+  !--------------------------------------------------!
+  do c = 1, Grid % n_cells
+    e = Vof % Front % elem_in_cell(c)
 
-      Vof % q_int(1,s) = 0.0
-      Vof % q_int(2,s) = 0.0
-
-      do i_ele = 1, 2
-        e = Vof % Front % elems_at_face(i_ele, s)
-        if(e .ne. 0) then
-
-          ! Take conductivities from each side of the interface
-          cond_1 = Vof % phase_cond(1)
-          cond_2 = Vof % phase_cond(2)
-          if(Vof % fun % n(c1) < 0.5) cond_1 = Vof % phase_cond(2)
-          if(Vof % fun % n(c2) > 0.5) cond_2 = Vof % phase_cond(1)
-
-          ! Compute heat fluxes from each side of the interface
-          ! Units: W/(mK) * K/m * m^2 = W
-          Vof % q_int(1,s) = Vof % q_int(1,s)                               &
-              + cond_1 * (  Flow % t % x(c1) * Vof % Front % elem(e) % sx   &
-                          + Flow % t % y(c1) * Vof % Front % elem(e) % sy   &
-                          + Flow % t % z(c1) * Vof % Front % elem(e) % sz)
-
-          Vof % q_int(2,s) = Vof % q_int(2,s)                               &
-              + cond_2 * (  Flow % t % x(c2) * Vof % Front % elem(e) % sx   &
-                          + Flow % t % y(c2) * Vof % Front % elem(e) % sy   &
-                          + Flow % t % z(c2) * Vof % Front % elem(e) % sz)
-
-        end if  ! e .ne. 0
-      end do    ! i_ele
-
-      ! Accumulate sources in the cells surroundig the face
-      ! Unit: W * kg/J = kg / s
-      if(Vof % Front % elem_in_cell(c1) .ne. 0) then
-        Vof % m_dot(c1) =  Vof % m_dot(c1)                       &
-                        + (Vof % q_int(2,s) - Vof % q_int(1,s))  &
-                        / 2.26e+6
-      end if
-
-      if(Vof % Front % elem_in_cell(c2) .ne. 0) then
-        Vof % m_dot(c2) =  Vof % m_dot(c2)                       &
-                        + (Vof % q_int(2,s) - Vof % q_int(1,s))  &
-                        / 2.26e+6
-      end if
-
-    end if      ! face is at the front
-
+    if(e .gt. 0) then
+      Vof % m_dot(c) = (  t_0 % x(c) * Front % Elem(e) % sx           &
+                        + t_0 % y(c) * Front % Elem(e) % sy           &
+                        + t_0 % z(c) * Front % Elem(e) % sz)          &
+                        * Vof % phase_cond(2)                         &
+                     - (  t_1 % x(c) * Front % Elem(e) % sx           &
+                        + t_1 % y(c) * Front % Elem(e) % sy           &
+                        + t_1 % z(c) * Front % Elem(e) % sz)          &
+                        * Vof % phase_cond(1)
+      Vof % m_dot(c) = Vof % m_dot(c) / 2.26e+6
+    end if
   end do
 
   end subroutine
