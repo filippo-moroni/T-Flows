@@ -20,7 +20,7 @@
     type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
     type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
     type(Front_Type)          :: Front     ! pointer to Front (simple surface)
-    type(Surf_Type)           :: surf      ! pointer to surface
+    type(Surf_Type)           :: Surf      ! pointer to surface
 
     ! Volume fraction (colour function) and its smooth variant
     type(Var_Type) :: fun
@@ -58,6 +58,10 @@
     ! Heat from phase change and index of saturated cells
     real, allocatable :: q_int(:,:)
     real, allocatable :: m_dot(:)         ! [kg/s]
+
+    ! Introduced to hold gradients in each of the phases
+    ! needed for estimation of mass transfer in cells
+    type(Var_Type) :: t_0, t_1
 
     ! User define parameters for vof function (fun)
     real    :: courant_max_param

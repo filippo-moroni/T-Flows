@@ -14,9 +14,6 @@
   type(Front_Type), pointer :: Front
   integer                   :: c, e, g, l, s, c1, c2, i_ele
   real                      :: cond_1, cond_2
-  type(Var_Type)            :: t_0, t_1  ! introduced to hold gradients in
-                                         ! each of the phases, needed for
-                                         ! estimation of mass transfer in cells
 !==============================================================================!
 
   ! Take aliases
@@ -41,10 +38,10 @@
   call Vof % Grad_Variable_With_Front(Flow % t, Vof % t_sat)
 
   ! First extrapolate temperature gradients from phase 0 to 1
-  call Vof % Extrapolate_Normal_To_Front(Flow, t_1, towards=1)
+  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1, towards=1)
 
   ! Then extrapolate temperature gradients from phase 1 to 0
-  call Vof % Extrapolate_Normal_To_Front(Flow, t_0, towards=0)
+  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_0, towards=0)
 
   !--------------------------------------------------!
   !   Compute heat flux at the interface cell-wise   !
@@ -53,13 +50,13 @@
     e = Vof % Front % elem_in_cell(c)
 
     if(e .gt. 0) then
-      Vof % m_dot(c) = (  t_0 % x(c) * Front % Elem(e) % sx           &
-                        + t_0 % y(c) * Front % Elem(e) % sy           &
-                        + t_0 % z(c) * Front % Elem(e) % sz)          &
-                        * Vof % phase_cond(2)                         &
-                     - (  t_1 % x(c) * Front % Elem(e) % sx           &
-                        + t_1 % y(c) * Front % Elem(e) % sy           &
-                        + t_1 % z(c) * Front % Elem(e) % sz)          &
+      Vof % m_dot(c) = (  Vof % t_0 % x(c) * Front % Elem(e) % sx           &
+                        + Vof % t_0 % y(c) * Front % Elem(e) % sy           &
+                        + Vof % t_0 % z(c) * Front % Elem(e) % sz)          &
+                        * Vof % phase_cond(2)                               &
+                     - (  Vof % t_1 % x(c) * Front % Elem(e) % sx           &
+                        + Vof % t_1 % y(c) * Front % Elem(e) % sy           &
+                        + Vof % t_1 % z(c) * Front % Elem(e) % sz)          &
                         * Vof % phase_cond(1)
       Vof % m_dot(c) = Vof % m_dot(c) / 2.26e+6
     end if
