@@ -3,6 +3,7 @@
                           Flow, Turb, Vof, Swarm, ts, plot_inside, domain)
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
+!   and .txt format (Snapshots)                                                !
 !------------------------------------------------------------------------------!
 !------------------------------------------------------------------------------!
   implicit none
@@ -30,9 +31,46 @@
   real,    pointer, contiguous :: save_04(:), save_05(:), save_06(:)
   real,    pointer, contiguous :: var_ins(:)
   real,    pointer, contiguous :: v2_calc(:), kin_vis_t(:), phi_save(:)
+  
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: PLOT_BUFFERS = .false.  ! .true. is good for debugging
 !==============================================================================!
+
+!------------------------------------------------------------------------------!
+!                        Snapshots area by Yves (1/2)                          !
+!------------------------------------------------------------------------------!
+  
+  type SnapShot	
+
+    real, allocatable :: u_snap(:), v_snap(:), w_snap(:), p_snap(:)	! x,y and z velocity components and pressure	  
+    real, allocatable :: x_snap(:), y_snap(:), z_snap(:)		! x,y and z coordinates of the cell
+    real, allocatable :: ni_turb(:)                                     ! generic turbulent viscosity	
+    
+    real, allocatable :: dudx_snap(:), dudy_snap(:), dudz_snap(:)       ! gradient components for the u velocity component
+    real, allocatable :: dvdx_snap(:), dvdy_snap(:), dvdz_snap(:)	! gradient components for the v velocity component
+    real, allocatable :: dwdx_snap(:), dwdy_snap(:), dwdz_snap(:)       ! gradient components for the w velocity component
+    
+    integer, allocatable :: pos_ind(:)     ! Position index of the cell in the ordered single vector
+    
+    real,    allocatable :: x_2(:)         ! "x" coordinate of the cell. It is necessary, otherwise "z_snap" would be ordered differently after sorting
+    real,    allocatable :: y_2(:)	   ! "y" coordinate of the cell. ""  ""
+    real,    allocatable :: z_2(:)	   ! "z" coordinate of the cell. ""  ""
+    
+  end type
+  
+  type(SnapShot) :: Snap		! Creation of the variable "Snap", of type "SnapShot"
+  
+  ! Local variables definition
+  
+  integer :: i = 0		
+  integer :: j = 0			
+  integer :: n_of_cells = 10000000	! This integer must be larger than the number of cells of the domain; it is used to allocate the memory
+  
+  character(len=1024) :: filename	! Filename of the file to open or to close
+  
+  integer :: n_c_tot = 0  		! Counter for the total number of cells
+
+!------------------------------------------------------------------------------!
 
   call Profiler % Start('Save_Vtu_Results')
 
@@ -284,6 +322,8 @@
   end if
   write(f9) IN_3 // '<CellData>' // LF
 
+!------------------------------------------------------------------------------!
+
   !----------------!
   !                !
   !   Two sweeps   !
@@ -414,6 +454,281 @@
                                       int_save(c_f:c_l),              &
                                       f8, f9, data_offset, run)
     end if
+
+!------------------------------------------------------------------------------!
+!                         Snapshots area by Yves (2/2)                         !
+!------------------------------------------------------------------------------!
+
+! Get the subgrid viscosity when Smagorinsky or Dynamic Smagorinsky are used
+
+    kin_vis_t(:) = 0.0
+    if(Turb % model .eq. LES_SMAGORINSKY .or.  &
+       Turb % model .eq. LES_DYNAMIC) then
+       kin_vis_t(c_f:c_l) = Turb % vis_t(c_f:c_l)       
+    end if
+      
+! Sub-Snapshots creation starts here (one for each processor)   
+  
+  if(run .eq. 1 .and. plot_inside) then            					     
+  			                                                                              													
+    if (this_proc < 10) write (filename, "(A8,I1,A4)") "SnapShot", this_proc, '.txt'		     
+    if (this_proc > 9)  write (filename, "(A8,I2,A4)") "SnapShot", this_proc, '.txt'	             
+  
+    open(unit=606+this_proc,file = trim(filename),form='formatted',status='unknown')		     
+  
+    do i = c_f, c_l									             
+       
+       if (Grid % vol(i) > 0.000000000001) then							     
+          
+    	     if(Turb % model .eq. LES_SMAGORINSKY .or.  &
+       		Turb % model .eq. LES_DYNAMIC) then
+             
+        	write (606+this_proc, *) Grid % xc(i),     &		 			               
+                                 	 Grid % yc(i),     &		                                       
+        				 Grid % zc(i),     &		                                       
+        			 	 Flow % u % n(i),  &		                                    
+        			 	 Flow % v % n(i),  &		                                      
+        			 	 Flow % w % n(i),  &		                                     
+        			 	 Flow % p % n(i),  &
+        			 	 Flow % u % x(i),  &		     
+        				 Flow % u % y(i),  &		      
+        				 Flow % u % z(i),  &		    
+        				 Flow % v % x(i),  &		      
+        				 Flow % v % y(i),  &		   
+        				 Flow % v % z(i),  &		      
+        				 Flow % w % x(i),  &		     
+        				 Flow % w % y(i),  &		    
+        				 Flow % w % z(i),  &
+        				 kin_vis_t(i)		           			 	 
+        			 	 
+             else
+        			 	 
+        	write (606+this_proc, *) Grid % xc(i),     &		 			               
+                                 	 Grid % yc(i),     &		                                       
+        				 Grid % zc(i),     &		                                       
+        			 	 Flow % u % n(i),  &		                                    
+        			 	 Flow % v % n(i),  &		                                      
+        			 	 Flow % w % n(i),  &		                                     
+        			 	 Flow % p % n(i),  &
+              			 	 Flow % u % x(i),  &		     
+        				 Flow % u % y(i),  &		      
+        				 Flow % u % z(i),  &		    
+        				 Flow % v % x(i),  &		      
+        				 Flow % v % y(i),  &		   
+        				 Flow % v % z(i),  &		      
+        				 Flow % w % x(i),  &		     
+        				 Flow % w % y(i),  &		    
+        				 Flow % w % z(i)
+        				       			 
+             end if
+        			 	 		 
+       end if										            
+    end do										            
+    
+    close(606+this_proc)								            
+    
+  end if											     
+
+  ! Creation of the total Snapshot
+ 			     
+  if(run .eq. 2 .and. this_proc .eq. n_proc .and. .not. plot_inside) then	   	             
+												     											
+    allocate(Snap % x_snap(n_of_cells));     Snap % x_snap = 0.0					     
+    allocate(Snap % y_snap(n_of_cells));     Snap % y_snap = 0.0					     
+    allocate(Snap % z_snap(n_of_cells));     Snap % z_snap = 0.0
+    allocate(Snap % u_snap(n_of_cells));     Snap % u_snap = 0.0					    
+    allocate(Snap % v_snap(n_of_cells));     Snap % v_snap = 0.0					     
+    allocate(Snap % w_snap(n_of_cells));     Snap % w_snap = 0.0					     
+    allocate(Snap % p_snap(n_of_cells));     Snap % p_snap = 0.0					         
+    allocate(Snap % dudx_snap(n_of_cells));  Snap % dudx_snap = 0.0					  
+    allocate(Snap % dudy_snap(n_of_cells));  Snap % dudy_snap = 0.0					  
+    allocate(Snap % dudz_snap(n_of_cells));  Snap % dudz_snap = 0.0					 
+    allocate(Snap % dvdx_snap(n_of_cells));  Snap % dvdx_snap = 0.0					 
+    allocate(Snap % dvdy_snap(n_of_cells));  Snap % dvdy_snap = 0.0					 
+    allocate(Snap % dvdz_snap(n_of_cells));  Snap % dvdz_snap = 0.0					  
+    allocate(Snap % dwdx_snap(n_of_cells));  Snap % dwdx_snap = 0.0					  
+    allocate(Snap % dwdy_snap(n_of_cells));  Snap % dwdy_snap = 0.0					 
+    allocate(Snap % dwdz_snap(n_of_cells));  Snap % dwdz_snap = 0.0
+    allocate(Snap % ni_turb(n_of_cells));    Snap % ni_turb = 0.0   					     
+  
+    do j = 1, n_proc									             
+    
+      if (j < 10) write (filename, "(A8,I1,A4)") "SnapShot", j, '.txt'				     
+      if (j > 9)  write (filename, "(A8,I2,A4)") "SnapShot", j, '.txt'				     
+  
+      open(unit=606+j,file = trim(filename),form='formatted',status='unknown')			     
+
+      do
+      
+    	if(Turb % model .eq. LES_SMAGORINSKY .or.  &
+      	   Turb % model .eq. LES_DYNAMIC) then                                                          
+      					
+	    	read (606+j,*, end=10)  Snap % x_snap(n_c_tot+1),     &				             
+				   	Snap % y_snap(n_c_tot+1),     &				             
+				   	Snap % z_snap(n_c_tot+1),     &				             
+				   	Snap % u_snap(n_c_tot+1),     &				             
+				   	Snap % v_snap(n_c_tot+1),     &					     
+				   	Snap % w_snap(n_c_tot+1),     &				             
+				   	Snap % p_snap(n_c_tot+1),     &
+				        Snap % dudx_snap(n_c_tot+1),  &					     
+				   	Snap % dudy_snap(n_c_tot+1),  &					 
+				   	Snap % dudz_snap(n_c_tot+1),  &					   
+				   	Snap % dvdx_snap(n_c_tot+1),  &					     
+				   	Snap % dvdy_snap(n_c_tot+1),  &					      
+				   	Snap % dvdz_snap(n_c_tot+1),  &					   
+				   	Snap % dwdx_snap(n_c_tot+1),  &					      
+				   	Snap % dwdy_snap(n_c_tot+1),  &					   
+				   	Snap % dwdz_snap(n_c_tot+1),  &				   	
+				   	Snap % ni_turb(n_c_tot+1)
+				   
+	    else
+	    
+	    	read (606+j,*, end=10)  Snap % x_snap(n_c_tot+1),     &				             
+				   	Snap % y_snap(n_c_tot+1),     &				             
+				   	Snap % z_snap(n_c_tot+1),     &				             
+				   	Snap % u_snap(n_c_tot+1),     &				             
+				   	Snap % v_snap(n_c_tot+1),     &					     
+				   	Snap % w_snap(n_c_tot+1),     &				             
+				   	Snap % p_snap(n_c_tot+1),     &
+				        Snap % dudx_snap(n_c_tot+1),  &					     
+				   	Snap % dudy_snap(n_c_tot+1),  &					 
+				   	Snap % dudz_snap(n_c_tot+1),  &					   
+				   	Snap % dvdx_snap(n_c_tot+1),  &					     
+				   	Snap % dvdy_snap(n_c_tot+1),  &					      
+				   	Snap % dvdz_snap(n_c_tot+1),  &					   
+				   	Snap % dwdx_snap(n_c_tot+1),  &					      
+				   	Snap % dwdy_snap(n_c_tot+1),  &					   
+				   	Snap % dwdz_snap(n_c_tot+1)			   
+				   
+            end if	   
+				   				   				   				       			   
+	    n_c_tot = n_c_tot + 1								     
+	    
+      end do										             
+
+      10 close (606+j, status='delete')								
+      								      								      								    
+    end do
+    
+    ! Ordering of the Snapshot according to cells' coordinates											   
+      
+    allocate(Snap % pos_ind(n_c_tot));  Snap % pos_ind = 0    
+    allocate(Snap % x_2(n_c_tot));      Snap % x_2 = 0.0
+    allocate(Snap % y_2(n_c_tot));      Snap % y_2 = 0.0
+    allocate(Snap % z_2(n_c_tot));      Snap % z_2 = 0.0
+
+    Snap % x_2(:) = HUGE
+    Snap % y_2(:) = HUGE
+    
+    do i = 1, n_c_tot
+    
+      Snap % pos_ind(i) = i
+      Snap % x_2(i) = min(Snap % x_2(i),  &
+                     Snap % x_snap(i))
+      Snap % y_2(i) = min(Snap % y_2(i),  &
+                     Snap % y_snap(i))
+      Snap % z_2(i) = Snap % z_snap(i)
+      
+    end do
+    
+  call Sort % Three_Real_Carry_Int(Snap % x_2, Snap % y_2, Snap % z_2, Snap % pos_ind)		          										
+    
+    ! Creation of the output Snapshot .txt file
+    
+    select case(ts)											  
+    													     													  
+      case (0:9)
+        write (filename, "(A16,I1,A4)") "SnapShot-ts00000", ts, '.txt'
+      case (10:99)
+        write (filename, "(A15,I2,A4)") "SnapShot-ts0000", ts, '.txt'
+      case (100:999)
+        write (filename, "(A14,I3,A4)") "SnapShot-ts000", ts, '.txt'
+      case (1000:9999)
+        write (filename, "(A13,I4,A4)") "SnapShot-ts00", ts, '.txt'
+      case (10000:99999)
+        write (filename, "(A12,I5,A4)") "SnapShot-ts0", ts, '.txt'
+      case default
+        write (filename, "(A11,I6,A4)") "SnapShot-ts", ts, '.txt'
+    end select
+
+    open(unit=607,file = trim(filename),form='formatted',status='unknown')				  
+    
+    do i = 1, n_c_tot
+      
+    	if(Turb % model .eq. LES_SMAGORINSKY .or.  &
+           Turb % model .eq. LES_DYNAMIC) then											  
+      
+     		 write (607, *) Snap % x_snap(Snap % pos_ind(i)), ',',  &						    
+        	     		Snap % y_snap(Snap % pos_ind(i)), ',',  &						    
+        	     		Snap % z_snap(Snap % pos_ind(i)), ',',  &						    
+          	     		Snap % u_snap(Snap % pos_ind(i)), ',',  &						   
+        	     		Snap % v_snap(Snap % pos_ind(i)), ',',  &						   
+        	     		Snap % w_snap(Snap % pos_ind(i)), ',',  &						    
+        	     		Snap % p_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dudx_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dudy_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dudz_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dvdx_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dvdy_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dvdz_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dwdx_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dwdy_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dwdz_snap(Snap % pos_ind(i)), ',',  &        	     		
+        	     		Snap % ni_turb(Snap % pos_ind(i))
+        	     		
+            else
+            
+     		 write (607, *) Snap % x_snap(Snap % pos_ind(i)), ',',  &						    
+        	     		Snap % y_snap(Snap % pos_ind(i)), ',',  &						    
+        	     		Snap % z_snap(Snap % pos_ind(i)), ',',  &						    
+          	     		Snap % u_snap(Snap % pos_ind(i)), ',',  &						   
+        	     		Snap % v_snap(Snap % pos_ind(i)), ',',  &						   
+        	     		Snap % w_snap(Snap % pos_ind(i)), ',',  &						    
+        	     		Snap % p_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dudx_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dudy_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dudz_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dvdx_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dvdy_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dvdz_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dwdx_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dwdy_snap(Snap % pos_ind(i)), ',',  &
+        	     		Snap % dwdz_snap(Snap % pos_ind(i))
+            
+            end if							           							
+        								     
+    end do
+    
+    close(607)												  
+    
+    deallocate(Snap % u_snap)										
+    deallocate(Snap % v_snap)										  
+    deallocate(Snap % w_snap)										  
+    deallocate(Snap % p_snap)										 
+    deallocate(Snap % x_snap)										  
+    deallocate(Snap % y_snap)										  
+    deallocate(Snap % z_snap)										  
+    deallocate(Snap % pos_ind)										  
+    deallocate(Snap % x_2)										 
+    deallocate(Snap % y_2)										  
+    deallocate(Snap % z_2)
+    deallocate(Snap % dudx_snap)
+    deallocate(Snap % dudy_snap)
+    deallocate(Snap % dudz_snap)
+    deallocate(Snap % dvdx_snap)
+    deallocate(Snap % dvdy_snap)
+    deallocate(Snap % dvdz_snap)
+    deallocate(Snap % dwdx_snap)
+    deallocate(Snap % dwdy_snap)
+    deallocate(Snap % dwdz_snap)
+    deallocate(Snap % ni_turb)										  
+         												 
+    n_c_tot = 0;											 
+
+  end if
+  
+!------------------------------------------------------------------------------!												  
+  
 
     !--------------!
     !   Velocity   !
@@ -828,8 +1143,7 @@
     end if
 
     ! Save y+ for all turbulence models
-    if(Turb % model .ne. NO_TURBULENCE_MODEL .and.  &
-       Turb % model .ne. DNS) then
+    if(Turb % model .ne. DNS) then
       call Results % Save_Scalar_Real("Turbulent Quantity Y Plus [1]",  &
                                       plot_inside,                      &
                                       Turb % y_plus(c_f:c_l),           &
@@ -1009,6 +1323,8 @@
     end if
 
   end do  ! run
+  
+!------------------------------------------------------------------------------!
 
   write(f9) IN_0 // '</VTKFile>'          // LF
   close(f9)
