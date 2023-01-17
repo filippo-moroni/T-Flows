@@ -34,7 +34,7 @@
 
     ! Stores the name of this domain
     character(SL) :: name
-    logical       :: polyhedral = .false.
+    logical       :: polyhedral
 
     ! Number of ...
     integer :: n_nodes     = 0  ! ... nodes
@@ -219,6 +219,7 @@
       procedure :: Save_Cfn
       procedure :: Save_Dim
       procedure :: Save_Debug_Vtu
+      procedure :: Save_Inertia        
       procedure :: Save_Vtu_Cells
       procedure :: Save_Vtu_Edges
       procedure :: Save_Vtu_Faces
@@ -270,6 +271,7 @@
 #   include "Grid_Mod/Save_Cfn.f90"
 #   include "Grid_Mod/Save_Dim.f90"
 #   include "Grid_Mod/Save_Debug_Vtu.f90"
+#   include "Grid_Mod/Save_Inertia.f90"          
 #   include "Grid_Mod/Save_Vtu_Cells.f90"
 #   include "Grid_Mod/Save_Vtu_Edges.f90"
 #   include "Grid_Mod/Save_Vtu_Faces.f90"
