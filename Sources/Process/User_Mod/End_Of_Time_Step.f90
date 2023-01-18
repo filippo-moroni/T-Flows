@@ -74,9 +74,9 @@
   	
   	tau_w = vis_dyn*u_parallel/wall_distance                    ! Wall shear stress
   	
-  	Cl = Cl - Flow % p % n(c)*dsy - tau_w*dsy                   ! Lift
+  	Cl = Cl - Flow % p % n(c)*dsy - tau_w*dsx                   ! Lift
   	
-  	Cd = Cd - Flow % p % n(c)*dsx + tau_w*dsx                   ! Drag
+  	Cd = Cd - Flow % p % n(c)*dsx + tau_w*dsy                   ! Drag
   	
   	end if
   
@@ -122,7 +122,16 @@
   
   end do
   
-  ! to complete with the complete snapshot creation
+  open(unit=607,file='Cl+Cd.txt',status='unknown',action='write',form='formatted',&
+       position='append')
+       
+  write(607, *) n, &
+  		Cl_tot, &
+  		Cd_tot
+  		
+  close(607)
+  
+  end if
   
   end subroutine
   
