@@ -31,8 +31,12 @@
   double precision :: u_vel,v_vel,w_vel        ! Velocity components 
   double precision :: dsx, dsy, dsz, ds        ! Face element area vector components and total magnitude
   double precision :: wall_distance
+  
+  double precision :: Cl_tot
+  double precision :: Cd_tot
    				
   integer :: c = 0
+  integer :: j = 0
   
   logical :: a = .true.
   			
@@ -87,22 +91,39 @@
   
   ! SubSnapshots creation
   
-  if (this_proc < 10) write (filename, "(A2,I1,A4)") "Cl", this_proc, '.txt'			
-  if (this_proc > 9)  write (filename, "(A2,I2,A4)") "Cl", this_proc, '.txt'
+  if (this_proc < 10) write (filename, "(A5,I1,A4)") "Cl+Cd", this_proc, '.txt'			
+  if (this_proc > 9)  write (filename, "(A5,I2,A4)") "Cl+Cd", this_proc, '.txt'
+    
+  ! Creation of the SubSnapshots with Cl and Cd 
   
-  if (this_proc < 10) write (filename, "(A2,I1,A4)") "Cd", this_proc, '.txt'			
-  if (this_proc > 9)  write (filename, "(A2,I2,A4)") "Cd", this_proc, '.txt'
-  
-  ! Creation of the final output file with Cl and Cd 
-  
-  open(unit=911+this_proc,file = trim(filename),status='unknown',  &
-       action='write',form='formatted',position="append")
+  open(unit=911+this_proc,file = trim(filename),status='unknown',form='formatted')
   
     	write (911+this_proc, *) Cl, &
-                             	 Cd						  
-        	     	     
+                             	 Cd						       	     	     
   close(911+this_proc)
-
+  
+  ! Creation of the total output
+  
+  if (this_proc .eq. n_proc) then
+  
+  do j = 1, n_proc									             
+    
+      if (j < 10) write (filename, "(A5,I1,A4)") "Cl+Cd", j, '.txt'				     
+      if (j > 9)  write (filename, "(A8,I2,A4)") "Cl+Cd", j, '.txt'				     
+  
+      open(unit=606+j,file = trim(filename),form='formatted',status='unknown')	
+      
+      read (606+j,*)  Cl,     &				             
+				   	          Cd
+      close(unit=606+j, status='delete')
+      
+      Cl_tot = Cl_tot + Cl
+      Cd_tot = Cd_tot + Cd
+  
+  end do
+  
+  ! to complete with the complete snapshot creation
+  
   end subroutine
   
   
