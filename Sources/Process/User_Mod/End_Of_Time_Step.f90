@@ -32,8 +32,8 @@
   double precision :: dsx, dsy, dsz, ds        ! Face element area vector components and total magnitude
   double precision :: wall_distance
   
-  double precision :: Cl_tot
-  double precision :: Cd_tot
+  double precision :: Cl_tot = 0.0
+  double precision :: Cd_tot = 0.0
    				
   integer :: c = 0
   integer :: j = 0
