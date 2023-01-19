@@ -203,6 +203,26 @@
     end if
 
   end do
+  
+  !-------------------------------------------------------!
+  ! Save grid inertia and coordinates for post processing !
+  !-------------------------------------------------------!
+  
+  print '(a)', ' #================================================='
+  print '(a)', ' # Would you like to save inertia properties?'
+  print '(a)', ' #-------------------------------------------------'
+  
+  print '(a)', ' #================================================='
+  print '(a)', ' # Press 1 to proceed, any other number to skip.'
+  print '(a)', ' #-------------------------------------------------'
+  
+  read *, answer_2
+  
+  if(answer_2 .eq. 1) then 
+  
+  call Grid(1) % Save_Inertia
+  
+  end if
 
   ! Finalize program profler
   call Profiler % Stop('Main')
