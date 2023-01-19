@@ -63,9 +63,7 @@
   allocate(Snap % cv_snap(Grid % n_cells));    Snap % cv_snap = 0.0
   
   open (unit=2, file='Inertia_uns.txt', form='formatted', status='unknown')
-  
-  !rewind(2)
- 
+
   do c = 1, Grid % n_cells
                
   	read (2,*)          Snap % x_snap(c),   &
