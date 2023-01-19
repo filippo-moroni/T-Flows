@@ -204,9 +204,9 @@
 
   end do
   
-  !-------------------------------------------------------!
-  ! Save grid inertia and coordinates for post processing !
-  !-------------------------------------------------------!
+  !------------------------------------------------------------!
+  ! Save grid inertia and cell dimensions for post processing  !
+  !------------------------------------------------------------!
   
   print '(a)', ' #================================================='
   print '(a)', ' # Would you like to save inertia properties?'
@@ -221,6 +221,26 @@
   if(answer_2 .eq. 1) then 
   
   call Grid(1) % Save_Inertia
+  
+  end if
+  
+  !------------------------------------------!
+  ! Save wall properties for post processing !
+  !------------------------------------------!
+  
+  print '(a)', ' #================================================='
+  print '(a)', ' # Would you like to save wall properties?'
+  print '(a)', ' #-------------------------------------------------'
+  
+  print '(a)', ' #================================================='
+  print '(a)', ' # Press 1 to proceed, any other number to skip.'
+  print '(a)', ' #-------------------------------------------------'
+  
+  read *, answer_3
+  
+  if(answer_3 .eq. 1) then 
+  
+  call Grid(1) % Save_Wall_Properties
   
   end if
 
