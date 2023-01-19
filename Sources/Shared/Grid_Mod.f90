@@ -223,6 +223,7 @@
       procedure :: Save_Vtu_Cells
       procedure :: Save_Vtu_Edges
       procedure :: Save_Vtu_Faces
+      procedure :: Save_Wall_Properties
       procedure :: Sort_Cells_By_Index
       procedure :: Sort_Cells_Smart
       procedure :: Sort_Faces_By_Index
@@ -275,6 +276,7 @@
 #   include "Grid_Mod/Save_Vtu_Cells.f90"
 #   include "Grid_Mod/Save_Vtu_Edges.f90"
 #   include "Grid_Mod/Save_Vtu_Faces.f90"
+#   include "Grid_Mod/Save_Wall_Properties.f90"
 #   include "Grid_Mod/Sort_Cells_By_Index.f90"
 #   include "Grid_Mod/Sort_Cells_Smart.f90"
 #   include "Grid_Mod/Sort_Faces_By_Index.f90"
