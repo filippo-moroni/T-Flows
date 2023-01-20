@@ -1142,7 +1142,7 @@
       end do
     end if
 
-    ! Save y+ for all turbulence models
+    ! Save y+ for all turbulence models and ILES (none option)
     if(Turb % model .ne. DNS) then
       call Results % Save_Scalar_Real("Turbulent Quantity Y Plus [1]",  &
                                       plot_inside,                      &
