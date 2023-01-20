@@ -3,7 +3,6 @@
 !------------------------------------------------------------------------------!
 ! Writes a .txt file that contains coordinates and wall faces properties:      !
 ! the 3 surface vector components, the face area and the wall distance         !
-!                                                                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
