@@ -38,7 +38,7 @@
    				
   integer :: c = 0
   integer :: j = 0
-  integer :: time_interval = 20   ! This parameter controls how many ts are between the Cd and Cl saving
+  integer :: time_interval = 20   ! This parameter controls how many ts are between 2 savings
   integer :: b
   
   logical :: a = .true.
