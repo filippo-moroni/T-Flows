@@ -31,7 +31,7 @@
   integer :: n_snaps                                   ! Number of Snapshots.
   integer :: answer                                    ! Integer to consider the turbulent viscosity or not.
   integer :: ts                                        ! Extra variable to perform the Reynolds stress calculations.
-  integer :: selection 		                             ! Integer to choose between performing the total average of some Snapshots 
+  integer :: selection 		                       ! Integer to choose between performing the total average of some Snapshots 
                                                        ! or only the spanwise average of a single Snapshot.
     
   ! Definition of some matrices and variables
@@ -372,9 +372,9 @@
   		           
    	end do
   	
-  	close (unit=1+i, status='keep')	  	   ! 'keep' to keep the Snapshots, otherwise 'delete' to delete them
+  	close (unit=1+i, status='keep')	  ! 'keep' to keep the Snapshots, otherwise 'delete' to delete them
   		
-  	ts = ts + ts_interval                  ! Update of the ts to open the next Snapshot
+  	ts = ts + ts_interval             ! Update of the ts to open the next Snapshot
   	
   end do
   
@@ -488,7 +488,7 @@
   		 			
   	end do
   	
-  	a = a + 1          ! This parameter allows to store the results in the summation matrix in a reduced number of rows.
+  	a = a + 1      ! This parameter allows to store the results in the summation matrix in a reduced number of rows.
                        ! Final total 'a' will be equal to n_c_tot_red
   end do
   
@@ -731,14 +731,14 @@
   	             		sum_ww(j-1), ',', &          ! <w"w">	             
   	             		sum_rs(j-1), ',', &          ! <u"v">
   	             		TKE_vector(j-1), ',', &      ! <k>
-                    sum_matrix_2(j-1, 8), ',', & ! mean subgrid stress tensor, component 11
-                    sum_matrix_2(j-1, 9), ',', & ! mean subgrid stress tensor, component 22
-                    sum_matrix_2(j-1,10), ',', & ! mean subgrid stress tensor, component 33
-                    sum_matrix_2(j-1,11), ',', & ! mean subgrid stress tensor, component 12
-                    sum_matrix_2(j-1,12), ',', & ! mean subgrid stress tensor, component 13
-                    sum_matrix_2(j-1,13), ',', & ! mean subgrid stress tensor, component 23
-                    sum_matrix_2(j-1,14), ',', & ! mean subgrid dissipation (epsilon_sgs)
-                    sum_matrix_2(j-1,15)         ! mean z-vorticity component
+                   	        sum_matrix_2(j-1, 8), ',', & ! mean subgrid stress tensor, component 11
+                                sum_matrix_2(j-1, 9), ',', & ! mean subgrid stress tensor, component 22
+                                sum_matrix_2(j-1,10), ',', & ! mean subgrid stress tensor, component 33
+                                sum_matrix_2(j-1,11), ',', & ! mean subgrid stress tensor, component 12
+                                sum_matrix_2(j-1,12), ',', & ! mean subgrid stress tensor, component 13
+                                sum_matrix_2(j-1,13), ',', & ! mean subgrid stress tensor, component 23
+                                sum_matrix_2(j-1,14), ',', & ! mean subgrid dissipation (epsilon_sgs)
+                                sum_matrix_2(j-1,15)         ! mean z-vorticity component
                                 
                 end if                      
                                                                              
@@ -915,7 +915,7 @@
   		sum_matrix(a,6)  = sum_matrix(a,6)  + snap(j+i,6)         ! W-velocity component
   		sum_matrix(a,7)  = sum_matrix(a,7)  + snap(j+i,7)         ! P, average pressure
    		sum_matrix(a,8)  = sum_matrix(a,8)  + &
-  				 + (snap(j+1,11) - snap(j+1,9))	                      ! z-vorticity component	
+  				 + (snap(j+1,11) - snap(j+1,9))	          ! z-vorticity component	
   		 			 
   	end do
   	
@@ -1019,17 +1019,17 @@
   		if (j .eq. 1) then
   			     	
   			     	write (2, *) 'x', ',', 'y', ',', 'z', ',', &
-  			     		           'U', ',', 'V', ',', 'W', ',', &
+  			     		     'U', ',', 'V', ',', 'W', ',', &
   			     	             'P', ',', '<omega_z>', ',', &
   			     	             '<u"u">|z', ',', '<v"v">|z', ',', &
-  			                   '<w"w">|z', ',', '<u"v">|z', ',', &
-  			                   '<k>|z'
+  			                     '<w"w">|z', ',', '<u"v">|z', ',', &
+  			                     '<k>|z'
   			     	            			     	  	
   		else	
           		
           		write (2, *) sum_matrix(j-1, 1), ',', &
-          		     	       sum_matrix(j-1, 2), ',', &
-          		     	       sum_matrix(j-1, 3), ',', &
+          		     	     sum_matrix(j-1, 2), ',', &
+          		     	     sum_matrix(j-1, 3), ',', &
           		             sum_matrix(j-1, 4), ',', &
           		             sum_matrix(j-1, 5), ',', &
           		             sum_matrix(j-1, 6), ',', &
