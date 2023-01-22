@@ -21,10 +21,10 @@
 
   type Snapshot
 
-  real, allocatable :: x_snap(:), y_snap(:), z_snap(:)            ! Coordinates
-	real, allocatable :: dsx_snap(:), dsy_snap(:), dsz_snap(:)      ! Surface vector components
-        real, allocatable :: ds_snap(:)                           ! Surface vector magnitude
-        real, allocatable :: wd_snap(:)                           ! Wall distance
+        real, allocatable :: x_snap(:), y_snap(:), z_snap(:)       ! Coordinates
+	real, allocatable :: dsx_snap(:), dsy_snap(:), dsz_snap(:) ! Surface vector components
+        real, allocatable :: ds_snap(:)                            ! Surface vector magnitude
+        real, allocatable :: wd_snap(:)                            ! Wall distance
 
 	real, allocatable :: x_2(:), y_2(:), z_2(:)
 
@@ -74,18 +74,18 @@
   
   if (Grid % cell_near_wall(c) .eqv. a) then                       ! Near-wall cell selection
   
-  	if (Grid % yc(c) .gt. -2.0 .and. Grid % yc(c) .lt. 2.0) then   ! Airfoil-wall selection
+  if (Grid % yc(c) .gt. -2.0 .and. Grid % yc(c) .lt. 2.0) then     ! Airfoil-wall selection
   	
-  	ds_wall = sqrt((Grid % sx(c))**2 + (Grid % sy(c))**2 + (Grid % sz(c))**2)
+  ds_wall = sqrt((Grid % sx(c))**2 + (Grid % sy(c))**2 + (Grid % sz(c))**2) 
   	
-	  write (911+this_proc, *) Grid % xc(c),       & ! x-coordinate
-                             Grid % yc(c),       & ! y-coordinate
-                     		     Grid % zc(c),       & ! z-coordinate                   
-		    		                 Grid % sx(c),       & ! dsx surface vector component
-  		    		               Grid % sy(c),       & ! dsy surface vector component
-	             		           Grid % sz(c),       & ! dsz surface vector component
-	             		           ds_wall,            & ! ds surface vector magnitude
-                     		     Grid % wall_dist(c)   ! wall distance
+  write (911+this_proc, *) Grid % xc(c),       & ! x-coordinate
+                           Grid % yc(c),       & ! y-coordinate
+                           Grid % zc(c),       & ! z-coordinate                   
+		           Grid % sx(c),       & ! dsx surface vector component
+  		           Grid % sy(c),       & ! dsy surface vector component
+	                   Grid % sz(c),       & ! dsz surface vector component
+	             	   ds_wall,            & ! ds surface vector magnitude
+                           Grid % wall_dist(c)   ! wall distance
                     
         end if
         
@@ -160,7 +160,7 @@
 
   do c = 1, n_c_tot
 
-	write(3, *) Snap % x_snap(Snap % pos_ind(c)), ',', &
+	      write(3, *) Snap % x_snap(Snap % pos_ind(c)), ',', &
 		          Snap % y_snap(Snap % pos_ind(c)), ',', &		    
 		          Snap % z_snap(Snap % pos_ind(c)), ',', &		    
 		          Snap % dsx_snap(Snap % pos_ind(c)), ',', &
