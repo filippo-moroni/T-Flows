@@ -19,6 +19,9 @@
   character(SL)   :: file_format    ! 'UNKNOWN', 'FLUENT', 'GAMBIT', 'GMSH'
   integer         :: l, p, g, n_grids
   logical         :: city
+  
+  integer         :: answer_2
+  integer         :: answer_3
 !==============================================================================!
 
   ! Initialize program profler
