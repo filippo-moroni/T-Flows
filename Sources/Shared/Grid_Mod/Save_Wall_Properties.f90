@@ -25,6 +25,7 @@
   type(Snapshot)  :: Snap
   
     real          :: nx,ny,nz  ! Normal vector components (versor).
+    real          :: ds        ! Surface area of the element.
       
     integer       :: s,c1,c2    
     integer       :: l = 0     ! Integer to count how many cells we have at the selected boundary.
@@ -34,13 +35,13 @@
 !==============================================================================!
 
   ! Display the BCs and save the BC's properties we are going to save 
+  
+  call Print_Bnd_Cond_List(Grid)
  
   print '(a)', ' #==================================='
   print '(a)', ' # Insert the BC name in upper cases '
   print '(a)', ' #-----------------------------------'
-  
-  call Print_Bnd_Cond_List(Grid)
-  
+   
   read *, answer
     
   ! Creation of a .txt file containing the cells' coordinates and their properties
@@ -60,9 +61,11 @@
   		
   		if(Grid % Bnd_Cond_Name(c2) .eq. answer) then
   		
-  		nx = Grid % sx(s) / Grid % s(s)     ! Normal vector components
-  		ny = Grid % sy(s) / Grid % s(s)
-  		nz = Grid % sz(s) / Grid % s(s)
+  		ds = sqrt((Grid % sx(s))**2 + (Grid % sy(s))**2 + (Grid % sz(s))**2)
+  		
+  		nx = Grid % sx(s) / ds               ! Normal vector components
+  		ny = Grid % sy(s) / ds
+  		nz = Grid % sz(s) / ds
   	 	  	
 		write (1, *) Grid % xc(c1),       &  ! x-coordinate
                      	     Grid % yc(c1),       &  ! y-coordinate
@@ -70,7 +73,7 @@
 			     nx,                  &  ! x-component normal vector
 			     ny,                  &  ! y-component normal vector
 			     nz,                  &  ! z-component normal vector			     
-                     	     Grid % s(s),         &  ! ds surface area
+                     	     ds,                  &  ! ds surface area
                     	     Grid % wall_dist(c1)    ! wall distance
                      
                              l = l + 1               ! Parameter to count...
