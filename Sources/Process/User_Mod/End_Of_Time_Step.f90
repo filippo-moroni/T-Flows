@@ -2,7 +2,7 @@
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
                                        n, n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
-! This function is called at the end of time step and calculates Cd and Cl     !
+! This function is called at the end of time step and calculates Cd and Cl.    !
 ! every 20 time steps.                                                         !
 !------------------------------------------------------------------------------!
   implicit none
@@ -19,29 +19,28 @@
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w
     
-  real :: vis_dyn = 1.78e-5 ! Dynamic viscosity
+  real :: vis_dyn = 1.78e-5        ! Dynamic viscosity
    
-  real :: n_versor(3)       ! Normal versor to the surface
-  real :: t_versor(3)       ! Tangent versor to the surface
-  real :: u_parallel 
-  real :: tau_w
-  real :: pressure
+  real :: nx,ny,nz                 ! Normal versor to the surface
+  real :: tx,ty,tz                 ! Tangent versor to the surface
+  real :: u_parallel               ! Parallel velocity to the surface
+  real :: tau_w                    ! Wall shear stress
+  real :: pressure                 ! Pressure
   
-  real :: u_vel,v_vel,w_vel       ! Velocity components 
-  real :: dsx, dsy, dsz, ds       ! Face element area vector components and total magnitude
-  real :: wall_distance
+  real :: u_vel,v_vel,w_vel        ! Velocity components 
+  real :: ds                       ! Area of the face at the boundary of an element
+  real :: wall_distance            ! Wall distance          
   
   real :: Cl = 0.0
   real :: Cd = 0.0
   real :: Cl_tot = 0.0
   real :: Cd_tot = 0.0
-   				
-  integer :: c = 0
-  integer :: j = 0
-  integer :: time_interval = 20   ! This parameter controls how many ts are between 2 savings
-  integer :: b
   
-  logical :: a = .true.
+  integer :: s,c1,c2 				
+  integer :: j = 0
+  integer :: time_interval = 20   ! This parameter controls how many ts are between the Cd and Cl saving
+  integer :: b                    ! Integer to verify if it is time to save Cd and Cl
+  
   logical :: exist
   			
   character(len=1024) :: filename	
@@ -52,7 +51,7 @@
   Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
   
-  ! Perform the drag and lift calculation if the ts is the right one
+  ! Perform the drag and lift calculations if the time-step is the right one
   
   b = mod(n,time_interval)
   
@@ -66,43 +65,46 @@
   Cd_tot = 0.0
   Cl_tot = 0.0
     
-  ! Consider only near-wall cells
+  ! Browse through all cells and select the airfoil boundary
   
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do s = 1, Grid % n_faces
   
-  if (Grid % cell_near_wall(c) .eqv. a) then                           ! Near-wall cell selection
-  
-  	if (Grid % yc(c) .gt. -2.0 .and. Grid % yc(c) .lt. 2.0) then   ! Airfoil-wall selection
+  	c1 = Grid % faces_c(1, s)
+  	c2 = Grid % faces_c(2, s)
+  	  	
+  	! Take only faces at the boundaries
+
+        if(c2 < 0) then
   	
-  	u_vel = Flow % u % n(c)
-  	v_vel = Flow % v % n(c)
-  	w_vel = Flow % w % n(c) 
+  	! Then only pick faces at the boundary condition called AIRFOIL
+
+        if(Grid % Bnd_Cond_Name(c2) .eq. 'AIRFOIL') then
   	
-  	pressure = Flow % p % n(c)
+  		u_vel = Flow % u % n(c1)       ! Velocity components
+  		v_vel = Flow % v % n(c1)
+  		w_vel = Flow % w % n(c1) 
   	
-  	dsx = Grid % sx(c)
-  	dsy = Grid % sy(c)
-  	dsz = Grid % sz(c)
+  		pressure = Flow % p % n(c1)    ! Pressure
   	
-  	ds = sqrt(dsx**2 + dsy**2 + dsz**2)
-  	
-  	wall_distance = Grid % wall_dist(c)
-  	  	  	  	
-  	n_versor(1) = dsx/ds                 ! Components of the normal vector to the surface (wall face)                                           
-  	n_versor(2) = dsy/ds
-  	n_versor(3) = dsz/ds
-  	
-  	t_versor(1) =  n_versor(2)           ! Tangent vector
-  	t_versor(2) = -n_versor(1)
-  	t_versor(3) =  n_versor(3)
-  	
-  	u_parallel = u_vel*t_versor(1) + v_vel*t_versor(2) + w_vel*t_versor(3)  ! Parallel velocity to the surface (first cell)
-  	
-  	tau_w = vis_dyn*u_parallel/wall_distance                  ! Wall shear stress
-  	
-  	Cd = Cd - pressure*ds*n_versor(1) + tau_w*ds*t_versor(1)  ! Drag  
+  		nx = Grid % sx(s)/Grid % s(s)  ! Normal vector to the surface
+  		ny = Grid % sy(s)/Grid % s(s)
+  		nz = Grid % sz(s)/Grid % s(s)
   		
-  	Cl = Cl - pressure*ds*n_versor(2) + tau_w*ds*t_versor(2)  ! Lift
+  		tx =  ny                       ! Tangent vector to the surface
+  		ty = -nx
+  		tz =  nz
+  	
+		ds = Grid % s(s)               ! Face element area 
+  	
+  		wall_distance = Grid % wall_dist(c1)         ! Wall distance
+  	  	  	  	  	
+  		u_parallel = u_vel*tx + v_vel*ty + w_vel*tz  ! Parallel velocity to the surface (first cell)
+  	
+  		tau_w = vis_dyn*u_parallel/wall_distance     ! Wall shear stress
+  	
+  		Cd = Cd - pressure*ds*nx + tau_w*ds*tx       ! Drag  
+  		
+  		Cl = Cl - pressure*ds*ny + tau_w*ds*ty       ! Lift
   	  	
   	end if
   
@@ -173,6 +175,4 @@
   end if ! Main if
    
   end subroutine
-  
-  
   
