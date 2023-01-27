@@ -68,7 +68,7 @@
   
   character(len=1024) :: filename	! Filename of the file to open or to close
   
-  integer :: n_c_tot = 0  		! Counter for the total number of cells
+  integer :: n_c_tot = 1  		! Counter for the total number of cells
 
 !------------------------------------------------------------------------------!
 
@@ -563,42 +563,42 @@
     	if(Turb % model .eq. LES_SMAGORINSKY .or.  &
       	   Turb % model .eq. LES_DYNAMIC) then                                                          
       					
-	    	read (606+j,*, end=10)  Snap % x_snap(n_c_tot+1),     &				             
-				   	Snap % y_snap(n_c_tot+1),     &				             
-				   	Snap % z_snap(n_c_tot+1),     &				             
-				   	Snap % u_snap(n_c_tot+1),     &				             
-				   	Snap % v_snap(n_c_tot+1),     &					     
-				   	Snap % w_snap(n_c_tot+1),     &				             
-				   	Snap % p_snap(n_c_tot+1),     &
-				        Snap % dudx_snap(n_c_tot+1),  &					     
-				   	Snap % dudy_snap(n_c_tot+1),  &					 
-				   	Snap % dudz_snap(n_c_tot+1),  &					   
-				   	Snap % dvdx_snap(n_c_tot+1),  &					     
-				   	Snap % dvdy_snap(n_c_tot+1),  &					      
-				   	Snap % dvdz_snap(n_c_tot+1),  &					   
-				   	Snap % dwdx_snap(n_c_tot+1),  &					      
-				   	Snap % dwdy_snap(n_c_tot+1),  &					   
-				   	Snap % dwdz_snap(n_c_tot+1),  &				   	
-				   	Snap % ni_turb(n_c_tot+1)
+	    	read (606+j,*, end=10)  Snap % x_snap(n_c_tot),     &				             
+				   	Snap % y_snap(n_c_tot),     &				             
+				   	Snap % z_snap(n_c_tot),     &				             
+				   	Snap % u_snap(n_c_tot),     &				             
+				   	Snap % v_snap(n_c_tot),     &					     
+				   	Snap % w_snap(n_c_tot),     &				             
+				   	Snap % p_snap(n_c_tot),     &
+				        Snap % dudx_snap(n_c_tot),  &					     
+				   	Snap % dudy_snap(n_c_tot),  &					 
+				   	Snap % dudz_snap(n_c_tot),  &					   
+				   	Snap % dvdx_snap(n_c_tot),  &					     
+				   	Snap % dvdy_snap(n_c_tot),  &					      
+				   	Snap % dvdz_snap(n_c_tot),  &					   
+				   	Snap % dwdx_snap(n_c_tot),  &					      
+				   	Snap % dwdy_snap(n_c_tot),  &					   
+				   	Snap % dwdz_snap(n_c_tot),  &				   	
+				   	Snap % ni_turb(n_c_tot)
 				   
 	    else
 	    
-	    	read (606+j,*, end=10)  Snap % x_snap(n_c_tot+1),     &				             
-				   	Snap % y_snap(n_c_tot+1),     &				             
-				   	Snap % z_snap(n_c_tot+1),     &				             
-				   	Snap % u_snap(n_c_tot+1),     &				             
-				   	Snap % v_snap(n_c_tot+1),     &					     
-				   	Snap % w_snap(n_c_tot+1),     &				             
-				   	Snap % p_snap(n_c_tot+1),     &
-				        Snap % dudx_snap(n_c_tot+1),  &					     
-				   	Snap % dudy_snap(n_c_tot+1),  &					 
-				   	Snap % dudz_snap(n_c_tot+1),  &					   
-				   	Snap % dvdx_snap(n_c_tot+1),  &					     
-				   	Snap % dvdy_snap(n_c_tot+1),  &					      
-				   	Snap % dvdz_snap(n_c_tot+1),  &					   
-				   	Snap % dwdx_snap(n_c_tot+1),  &					      
-				   	Snap % dwdy_snap(n_c_tot+1),  &					   
-				   	Snap % dwdz_snap(n_c_tot+1)			   
+	    	read (606+j,*, end=10)  Snap % x_snap(n_c_tot),     &				             
+				   	Snap % y_snap(n_c_tot),     &				             
+				   	Snap % z_snap(n_c_tot),     &				             
+				   	Snap % u_snap(n_c_tot),     &				             
+				   	Snap % v_snap(n_c_tot),     &					     
+				   	Snap % w_snap(n_c_tot),     &				             
+				   	Snap % p_snap(n_c_tot),     &
+				        Snap % dudx_snap(n_c_tot),  &					     
+				   	Snap % dudy_snap(n_c_tot),  &					 
+				   	Snap % dudz_snap(n_c_tot),  &					   
+				   	Snap % dvdx_snap(n_c_tot),  &					     
+				   	Snap % dvdy_snap(n_c_tot),  &					      
+				   	Snap % dvdz_snap(n_c_tot),  &					   
+				   	Snap % dwdx_snap(n_c_tot),  &					      
+				   	Snap % dwdy_snap(n_c_tot),  &					   
+				   	Snap % dwdz_snap(n_c_tot)			   
 				   
             end if	   
 				   				   				   				       			   
@@ -723,7 +723,7 @@
     deallocate(Snap % dwdz_snap)
     deallocate(Snap % ni_turb)										  
          												 
-    n_c_tot = 0;											 
+    n_c_tot = 1;											 
 
   end if
   
