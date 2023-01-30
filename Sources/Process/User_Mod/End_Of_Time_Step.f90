@@ -2,7 +2,7 @@
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
                                        n, n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
-! This function is called at the end of time step and calculates Cd and Cl.    !
+! This function is called at the end of time step and calculates Cd and Cl     !
 ! every 20 time steps.                                                         !
 !------------------------------------------------------------------------------!
   implicit none
