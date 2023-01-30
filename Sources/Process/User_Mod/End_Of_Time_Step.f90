@@ -21,13 +21,13 @@
     
   real :: vis_dyn = 1.78e-5        ! Dynamic viscosity
    
-  real :: nx,ny,nz                 ! Normal versor to the surface
-  real :: tx,ty,tz                 ! Tangent versor to the surface
+  real :: nx,ny                    ! Normal versor to the surface
+  real :: tx,ty                    ! Tangent versor to the surface
   real :: u_parallel               ! Parallel velocity to the surface
   real :: tau_w                    ! Wall shear stress
   real :: pressure                 ! Pressure
   
-  real :: u_vel,v_vel,w_vel        ! Velocity components 
+  real :: u_vel,v_vel              ! Velocity components 
   real :: ds                       ! Area of the face at the boundary of an element
   real :: wall_distance            ! Wall distance          
   
@@ -81,24 +81,21 @@
         if(Grid % Bnd_Cond_Name(c2) .eq. 'AIRFOIL') then
   	
   		u_vel = Flow % u % n(c1)       ! Velocity components
-  		v_vel = Flow % v % n(c1)
-  		w_vel = Flow % w % n(c1) 
+  		v_vel = Flow % v % n(c1) 
   	
   		pressure = Flow % p % n(c1)    ! Pressure
   	
   		nx = Grid % sx(s)/Grid % s(s)  ! Normal vector to the surface
   		ny = Grid % sy(s)/Grid % s(s)
-  		nz = Grid % sz(s)/Grid % s(s)
   		
   		tx =  ny                       ! Tangent vector to the surface
   		ty = -nx
-  		tz =  nz
   	
 		ds = Grid % s(s)               ! Face element area 
   	
   		wall_distance = Grid % wall_dist(c1)         ! Wall distance
   	  	  	  	  	
-  		u_parallel = u_vel*tx + v_vel*ty + w_vel*tz  ! Parallel velocity to the surface (first cell)
+  		u_parallel = u_vel*tx + v_vel*ty             ! Parallel velocity to the surface (first cell)
   	
   		tau_w = vis_dyn*u_parallel/wall_distance     ! Wall shear stress
   	
