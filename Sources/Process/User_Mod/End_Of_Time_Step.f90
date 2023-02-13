@@ -41,6 +41,11 @@
   integer :: time_interval = 20   ! This parameter controls how many ts are between the Cd and Cl saving
   integer :: b                    ! Integer to verify if it is time to save Cd and Cl
   
+  real    :: m_chord_line = -0.266611  ! This is the slope of the chord line, ...
+  						! ... used to invert the tangent vectors on the pressure side.
+  						
+  real    :: y_check                   ! To check if we are on the pressure side or not.
+  
   logical :: exist
   			
   character(len=1024) :: filename	
@@ -87,11 +92,21 @@
   	
   		nx = Grid % sx(s)/Grid % s(s)  ! Normal vector to the surface
   		ny = Grid % sy(s)/Grid % s(s)
-  		
+  				
   		tx =  ny                       ! Tangent vector to the surface
   		ty = -nx
+  		
+  		y_check = m_chord_line*Grid % xf(c2)
+  		    
+  		    if(y_check .gt. Grid % yf(c2)) then  ! Check if the cell we are considering is on the pressure side.
+  		    					 ! If so, invert the tangent vector.
+  		    
+  		    tx = -tx
+  		    ty = -ty
+  		    
+  		    end if
   	
-		ds = Grid % s(s)               ! Face element area 
+		ds = Grid % s(s)                             ! Face element area 
   	
   		wall_distance = Grid % wall_dist(c1)         ! Wall distance
   	  	  	  	  	
