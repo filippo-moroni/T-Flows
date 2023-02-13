@@ -42,7 +42,7 @@
   integer :: b                    ! Integer to verify if it is time to save Cd and Cl
   
   real    :: m_chord_line = -0.266611  ! This is the slope of the chord line, ...
-  						! ... used to invert the tangent vectors on the pressure side.
+  				       ! ... used to invert the tangent vectors on the pressure side.
   						
   real    :: y_check                   ! To check if we are on the pressure side or not.
   
