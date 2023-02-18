@@ -36,6 +36,7 @@
   real :: Cl_tot = 0.0
   real :: Cd_tot = 0.0
   
+  integer :: iunit
   integer :: s,c1,c2 				
   integer :: j = 0
   integer :: time_interval = 20   ! This parameter controls how many ts are between the Cd and Cl saving
@@ -138,11 +139,11 @@
     
   ! Creation of the SubSnapshots with Cd and Cl 
   
-  open(unit=911+this_proc,file = trim(filename),status='unknown',form='formatted')
+  open(newunit=iunit,file = trim(filename),status='unknown',form='formatted')
   
-    	write (911+this_proc, *) Cd, &
-                             	 Cl						       	     	     
-  close(911+this_proc)
+    	write (iunit, *) Cd, &
+                         Cl						       	     	     
+  close(iunit)
   
 !----------------------------------------------------------!
 
@@ -155,12 +156,12 @@
       if (j < 10) write (filename, "(A5,I1,A4)") "Cd+Cl", j, '.txt'				     
       if (j > 9)  write (filename, "(A5,I2,A4)") "Cd+Cl", j, '.txt'				     
   
-      open(unit=606+j,file = trim(filename),form='formatted',status='unknown')	
+      open(newunit=iunit,file = trim(filename),form='formatted',status='unknown')	
       
-      read (606+j, *,end=10)  Cd, &				             
+      read (iunit, *,end=10)  Cd, &				             
 		              Cl
 		              
-      10 close(unit=606+j, status='delete')
+      10 close(unit=iunit, status='delete')
 	
       Cd_tot = Cd_tot + Cd
       	            
@@ -171,16 +172,16 @@
   inquire(file="Cd+Cl_tot.txt", exist=exist)
   
   if (exist) then
-    open(201, file="Cd+Cl_tot.txt", status="old", position="append", action="write")
+    open(newunit=iunit, file="Cd+Cl_tot.txt", status="old", position="append", action="write")
   else
-    open(201, file="Cd+Cl_tot.txt", status="new", action="write")
+    open(newunit=iunit, file="Cd+Cl_tot.txt", status="new", action="write")
   end if
          
-  write(201, *) n, &
-  		Cd_tot, &
-  		Cl_tot
+  write(iunit, *) n, &
+  		  Cd_tot, &
+  		  Cl_tot
   		
-  close(201)
+  close(iunit)
   
   end if
   
