@@ -61,6 +61,7 @@
     izp = ( 0.5 * (- Grid % ixx (c)  &
                    - Grid % iyy (c)  &
                    + Grid % izz (c) ) )     ! I'zz         (I'33)
+                   
     ixyp = Grid % ixy (c)              ! I'xy = I'yx  (I'12 = I'21)
     ixzp = Grid % ixz (c)              ! I'xz = I'zx  (I'13 = I'31)
     iyzp = Grid % iyz (c)              ! I'yz = I'zy  (I'23 = I'32)
