@@ -132,25 +132,19 @@
                          + (- sgv_y  * du_dy - sgv_yx * dv_dy)  &
                          + (- sgv_zy * du_dz - sgv_zx * dv_dz)
 
-    Turb % tau_21 (c)    = (- sgv_x  * dv_dx - sgv_xy * du_dx)  &
-                         + (- sgv_yx * dv_dy - sgv_y  * du_dy)  &
-                         + (- sgv_zx * dv_dz - sgv_zy * du_dz)
+    Turb % tau_21 (c)    = Turb % tau_12 (c)
 
     Turb % tau_13 (c)    = (- sgv_xz * du_dx - sgv_x  * dw_dx)  &
                          + (- sgv_yz * du_dy - sgv_yx * dw_dy)  &
                          + (- sgv_z  * du_dz - sgv_zx * dw_dz)
 
-    Turb % tau_31 (c)    = (- sgv_x  * dw_dx - sgv_xz * du_dx)  &
-                         + (- sgv_yx * dw_dy - sgv_yz * du_dy)  &
-                         + (- sgv_zx * dw_dz - sgv_z  * du_dz)
+    Turb % tau_31 (c)    = Turb % tau_13 (c)
 
     Turb % tau_23 (c)    = (- sgv_xz * dv_dx - sgv_xy * dw_dx)  &
                          + (- sgv_yz * dv_dy - sgv_y  * dw_dy)  &
                          + (- sgv_z  * dv_dz - sgv_zy * dw_dz)
 
-    Turb % tau_32 (c)    = (- sgv_xy * dw_dx - sgv_xz * dv_dx)  &
-                         + (- sgv_y  * dw_dy - sgv_yz * dv_dy)  &
-                         + (- sgv_zy * dw_dz - sgv_z  * dv_dz)
+    Turb % tau_32 (c)    = Turb % tau_23 (c)
 
   end do
 
