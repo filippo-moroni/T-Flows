@@ -63,6 +63,9 @@
 
     ! Cells' tensor of inertia
     real, allocatable :: ixx(:), iyy(:), izz(:), ixy(:), ixz(:), iyz(:)
+    
+    ! Cells' modified tensor of inertia I'
+    real, allocatable :: ixp(:), iyp(:), izp(:), ixyp(:), ixzp(:), iyzp(:)
 
     ! Fractional cell volumes around faces
     real, allocatable :: dv1(:)
