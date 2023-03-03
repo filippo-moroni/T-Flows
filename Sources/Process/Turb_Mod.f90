@@ -214,26 +214,27 @@
   integer, parameter :: LES_DYNAMIC           = 30047
   integer, parameter :: LES_WALE              = 30059
   integer, parameter :: LES_TVM               = 30071
-  integer, parameter :: K_EPS                 = 30089
-  integer, parameter :: K_EPS_ZETA_F          = 30091
-  integer, parameter :: DES_SPALART           = 30097
-  integer, parameter :: SPALART_ALLMARAS      = 30103
-  integer, parameter :: RSM_HANJALIC_JAKIRLIC = 30109
-  integer, parameter :: RSM_MANCEAU_HANJALIC  = 30113
-  integer, parameter :: HYBRID_LES_RANS       = 30119
-  integer, parameter :: HYBRID_LES_PRANDTL    = 30133
+  integer, parameter :: LES_TVM_DF            = 30089
+  integer, parameter :: K_EPS                 = 30091
+  integer, parameter :: K_EPS_ZETA_F          = 30097
+  integer, parameter :: DES_SPALART           = 30103
+  integer, parameter :: SPALART_ALLMARAS      = 30109
+  integer, parameter :: RSM_HANJALIC_JAKIRLIC = 30113
+  integer, parameter :: RSM_MANCEAU_HANJALIC  = 30119
+  integer, parameter :: HYBRID_LES_RANS       = 30133
+  integer, parameter :: HYBRID_LES_PRANDTL    = 30137
 
   ! Turbulence wall treatment
-  integer, parameter :: STABILIZED = 30137
+  integer, parameter :: STABILIZED = 30139
 
   ! Turbulent heat flux scheme
-  integer, parameter :: SGDH = 30139
-  integer, parameter :: GGDH = 30161
-  integer, parameter :: AFM  = 30169
+  integer, parameter :: SGDH = 30161
+  integer, parameter :: GGDH = 30169
+  integer, parameter :: AFM  = 30181
 
   ! Switching criteria for hybrid LES/RANS
-  integer, parameter :: SWITCH_DISTANCE = 30181
-  integer, parameter :: SWITCH_VELOCITY = 30187
+  integer, parameter :: SWITCH_DISTANCE = 30187
+  integer, parameter :: SWITCH_VELOCITY = 30197
 
   !--------------------------------!
   !   Turbulence model constants   !
