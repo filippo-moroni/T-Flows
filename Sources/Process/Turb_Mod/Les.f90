@@ -25,6 +25,9 @@
   else if(Turb % model .eq. LES_TVM) then
     Les = .true.
     return
+  else if(Turb % model .eq. LES_TVM_DF) then
+    Les = .true.
+    return    
   end if
 
   end function
