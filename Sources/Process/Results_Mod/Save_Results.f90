@@ -459,11 +459,12 @@
 !                         Snapshots area by Yves (2/2)                         !
 !------------------------------------------------------------------------------!
 
-! Get the subgrid viscosity when Smagorinsky or Dynamic Smagorinsky are used
+! Get the subgrid viscosity when Smagorinsky or Dynamic Smagorinsky or WALE models are used
 
     kin_vis_t(:) = 0.0
     if(Turb % model .eq. LES_SMAGORINSKY .or.  &
-       Turb % model .eq. LES_DYNAMIC) then
+       Turb % model .eq. LES_DYNAMIC .or. &
+       Turb % model .eq. LES_WALE) then
        kin_vis_t(c_f:c_l) = Turb % vis_t(c_f:c_l)       
     end if
       
@@ -481,7 +482,8 @@
        if (Grid % vol(i) > 0.000000000001) then							     
           
     	     if(Turb % model .eq. LES_SMAGORINSKY .or.  &
-       		Turb % model .eq. LES_DYNAMIC) then
+       		Turb % model .eq. LES_DYNAMIC .or. &
+		Turb % model .eq. LES_WALE) then
              
         	write (606+this_proc, *) Grid % xc(i),     &		 			               
                                  	 Grid % yc(i),     &		                                       
@@ -561,7 +563,8 @@
       do
       
     	if(Turb % model .eq. LES_SMAGORINSKY .or.  &
-      	   Turb % model .eq. LES_DYNAMIC) then                                                          
+      	   Turb % model .eq. LES_DYNAMIC .or. &
+	   Turb % model .eq. LES_WALE) then                                                          
       					
 	    	read (606+j,*, end=10)  Snap % x_snap(n_c_tot+1),     &				             
 				   	Snap % y_snap(n_c_tot+1),     &				             
@@ -656,7 +659,8 @@
     do i = 1, n_c_tot
       
     	if(Turb % model .eq. LES_SMAGORINSKY .or.  &
-           Turb % model .eq. LES_DYNAMIC) then											  
+           Turb % model .eq. LES_DYNAMIC .or. &
+	   Turb % model .eq. LES_WALE) then											  
       
      		 write (607, *) Snap % x_snap(Snap % pos_ind(i)), ',',  &						    
         	     		Snap % y_snap(Snap % pos_ind(i)), ',',  &						    
