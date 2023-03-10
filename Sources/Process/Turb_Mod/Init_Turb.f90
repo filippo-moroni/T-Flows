@@ -36,6 +36,7 @@
 
   if(Turb % model .eq. LES_TVM) then
     call Turb % Vis_T_Tensorial()
+    call Calculate_Shear_And_Vorticity(Flow)
   end if
   
   if(Turb % model .eq. LES_TVM_DF) then
