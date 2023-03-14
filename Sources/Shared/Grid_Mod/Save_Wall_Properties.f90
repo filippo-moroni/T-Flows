@@ -1,8 +1,8 @@
 !==============================================================================!
   subroutine Save_Wall_Properties(Grid)
 !------------------------------------------------------------------------------!
-! Writes a .txt file that contains coordinates and wall faces properties:      !
-! the normals to the surface, the face element area and the wall distance.     !
+! Writes a .txt file that contains coordinates and wall faces properties of a  !
+! selected boundary face.                                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -15,21 +15,19 @@
 	real, allocatable    :: nx_snap(:), ny_snap(:), nz_snap(:)  ! Surface vector components
         real, allocatable    :: ds_snap(:)                          ! Surface vector magnitude
         real, allocatable    :: wd_snap(:)                          ! Wall distance
-
 	real, allocatable    :: x_2(:), y_2(:), z_2(:)              ! Coordinates for the sorting
-
-	integer, allocatable :: pos_ind(:)                          ! Position index
+	integer, allocatable :: pos_ind(:)                          ! Position index for sorting
 
   end type
 
   type(Snapshot)  :: Snap
   
-    real          :: nx,ny,nz  ! Normal vector components (versor).
-    real          :: ds        ! Surface area of the element.     
+    real          :: nx,ny,nz  ! Normal vector components (versor)
+    real          :: ds        ! Surface area of the element    
     integer       :: s,c1,c2    
-    integer       :: l = 0     ! Integer to count how many cells we have at the selected boundary.
+    integer       :: l = 0     ! Integer to count how many cells we have at the selected boundary
     integer       :: c, iunit   
-    character(SL) :: answer            
+    character(SL) :: answer                
 !==============================================================================!
 
   ! Display the BCs list and save the selected BC's properties 
@@ -55,7 +53,7 @@
   		
   		ds = sqrt((Grid % sx(s))**2 + (Grid % sy(s))**2 + (Grid % sz(s))**2)
   		
-  		nx = Grid % sx(s) / ds               ! Normal vector components
+  		nx = Grid % sx(s) / ds                   ! Normal vector components
   		ny = Grid % sy(s) / ds
   		nz = Grid % sz(s) / ds
   	 	  	
