@@ -39,8 +39,8 @@
   integer :: iunit
   integer :: s,c1,c2 				
   integer :: j = 0
-  integer :: time_interval = 20   ! This parameter controls how many ts are between the Cd and Cl saving
-  integer :: b                    ! Integer to verify if it is time to save Cd and Cl
+  integer :: time_interval = 20        ! This parameter controls how many ts are between the Cd and Cl saving
+  integer :: b                         ! Integer to verify if it is time to save Cd and Cl
   
   real    :: m_chord_line = -0.266611  ! This is the slope of the chord line, ...
   				       ! ... used to invert the tangent vectors on the pressure side.
@@ -53,18 +53,14 @@
 !==============================================================================!
 
   ! Take aliases
- 
   Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
   
-  ! Perform the drag and lift calculations if the time-step is the right one
-  
+  ! Perform the drag and lift calculations if the time-step is the right one 
   b = mod(n,time_interval)
-  
   if (b .eq. 0) then
   
   ! Reset Cd and Cl values to zero
-  
   Cd = 0.0
   Cl = 0.0 
   
@@ -72,18 +68,15 @@
   Cl_tot = 0.0
     
   ! Browse through all cells and select the airfoil boundary
-  
   do s = 1, Grid % n_faces
   
   	c1 = Grid % faces_c(1, s)
   	c2 = Grid % faces_c(2, s)
   	  	
   	! Take only faces at the boundaries
-
         if(c2 < 0) then
   	
   	! Then only pick faces at the boundary condition called AIRFOIL
-
         if(Grid % Bnd_Cond_Name(c2) .eq. 'AIRFOIL') then
   	
   		u_vel = Flow % u % n(c1)       ! Velocity components
@@ -99,9 +92,8 @@
   		
   		y_check = m_chord_line*Grid % xf(c2)
   		    
-  		    if(y_check .gt. Grid % yf(c2)) then  ! Check if the cell we are considering is on the pressure side.
-  		    					 ! If so, invert the tangent vector.
-  		    
+  		    if(y_check .gt. Grid % yf(c2)) then  ! Check if the cell we are considering is on the pressure side:
+  		    					 ! if so, invert the tangent vector.	    
   		    tx = -tx
   		    ty = -ty
   		    
@@ -126,19 +118,17 @@
   end do
   
   ! Calculating the coefficients and inverting the signs
-  ! Reference quantities: u_ref = 1 m/s, c = 1 m and b = 0.6 m
+  ! Reference quantities: u_ref = 1 [m/s], c = 1 [m] and b = 0.6 [m]
   
   Cd = -Cd / 0.36
   
   Cl = -Cl / 0.36
   
-  ! SubSnapshots creation
-  
+  ! SubSnapshots creation 
   if (this_proc < 10) write (filename, "(A5,I1,A4)") "Cd+Cl", this_proc, '.txt'			
   if (this_proc > 9)  write (filename, "(A5,I2,A4)") "Cd+Cl", this_proc, '.txt'
     
-  ! Creation of the SubSnapshots with Cd and Cl 
-  
+  ! Creation of the SubSnapshots with Cd and Cl  
   open(newunit=iunit,file = trim(filename),status='unknown',form='formatted')
   
     	write (iunit, *) Cd, &
@@ -148,7 +138,6 @@
 !----------------------------------------------------------!
 
   ! Creation of the total output
-  
   if (this_proc .eq. n_proc) then
   
   do j = 1, n_proc									             
@@ -188,4 +177,3 @@
   end if ! Main if
    
   end subroutine
-  
