@@ -1,8 +1,8 @@
 !==============================================================================!
   subroutine Save_Inertia(Grid)
 !------------------------------------------------------------------------------!
-! Writes a .txt file that contains the inertia moments and the cells volumes,  !
-!               used for post-processing of the TVM model.                     !
+! Writes a .txt file that contains the inertia moments and the cells volume,   !
+! used for post-processing of the TVM model.                                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -58,11 +58,11 @@
   allocate(Snap % iyz_snap(Grid % n_cells));   Snap % iyz_snap = 0.0
   allocate(Snap % cv_snap(Grid % n_cells));    Snap % cv_snap = 0.0
   
-  open (unit=2, file='Inertia_uns.txt', form='formatted', status='unknown')
+  open (newunit=iunit, file='Inertia_uns.txt', form='formatted', status='unknown')
 
   do c = 1, Grid % n_cells
                
-  	read (2,*)          Snap % x_snap(c),   &
+  	read (iunit,*)      Snap % x_snap(c),   &
                             Snap % y_snap(c),   &
                             Snap % z_snap(c),   &
                             Snap % ixx_snap(c), &
@@ -75,10 +75,9 @@
                                                                                                    			       
   end do
   
-  close (2, status='delete')
+  close (iunit, status='delete')
   	
   ! Ordering the cells through their coordinates
-
   allocate(Snap % pos_ind(Grid % n_cells));  Snap % pos_ind = 0
   allocate(Snap % x_2(Grid % n_cells));      Snap % x_2 = 0.0
   allocate(Snap % y_2(Grid % n_cells));      Snap % y_2 = 0.0
@@ -99,25 +98,23 @@
   Call Sort % Three_Real_Carry_Int(Snap % x_2, Snap % y_2, Snap % z_2, Snap % pos_ind)
 
   ! Writing the file with ordered cells according to their coordinates
-
-  open(unit=3,file='Inertia.txt',form='formatted',status='unknown')
+  open(newunit=iunit,file='Inertia.txt',form='formatted',status='unknown')
 
   do c = 1, Grid % n_cells
 
-	write(3, *) Snap % x_snap(Snap % pos_ind(c)), ',', &
-		    Snap % y_snap(Snap % pos_ind(c)), ',', &
-		    Snap % z_snap(Snap % pos_ind(c)), ',', &
-		    Snap % ixx_snap(Snap % pos_ind(c)), ',', &
-		    Snap % iyy_snap(Snap % pos_ind(c)), ',', &
-		    Snap % izz_snap(Snap % pos_ind(c)), ',', &
-		    Snap % ixy_snap(Snap % pos_ind(c)), ',', &
-		    Snap % ixz_snap(Snap % pos_ind(c)), ',', &
-		    Snap % iyz_snap(Snap % pos_ind(c)), ',', &
-		    Snap % cv_snap(Snap % pos_ind(c))
-
+	write(iunit, *) Snap % x_snap(Snap % pos_ind(c)), ',', &
+		        Snap % y_snap(Snap % pos_ind(c)), ',', &
+		        Snap % z_snap(Snap % pos_ind(c)), ',', &
+		        Snap % ixx_snap(Snap % pos_ind(c)), ',', &
+		        Snap % iyy_snap(Snap % pos_ind(c)), ',', &
+		        Snap % izz_snap(Snap % pos_ind(c)), ',', &
+		        Snap % ixy_snap(Snap % pos_ind(c)), ',', &
+		        Snap % ixz_snap(Snap % pos_ind(c)), ',', &
+		        Snap % iyz_snap(Snap % pos_ind(c)), ',', &
+		        Snap % cv_snap(Snap % pos_ind(c))
   end do 
   
-  close(3)
+  close(iunit)
 
   deallocate(Snap % x_snap)     
   deallocate(Snap % y_snap)     
@@ -135,9 +132,3 @@
   deallocate(Snap % z_2)
 
   end subroutine
-
-
-
-
-
-
