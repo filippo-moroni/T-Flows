@@ -23,8 +23,7 @@
   type(Snapshot) :: Snap
       
     integer :: c = 0 
-    integer :: iunit
-            
+    integer :: iunit          
 !==============================================================================!
 
   ! Creation of a .txt file containing the cells' coordinates and the inertia moments
@@ -71,8 +70,7 @@
                             Snap % ixy_snap(c), &
                             Snap % ixz_snap(c), &
                             Snap % iyz_snap(c), &
-                            Snap % cv_snap(c)
-                                                                                                   			       
+                            Snap % cv_snap(c)                                                                                                  			       
   end do
   
   close (iunit, status='delete')
