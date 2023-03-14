@@ -11,46 +11,42 @@
     
   type Snapshot
 
-  	real, allocatable :: x_snap(:), y_snap(:), z_snap(:)            ! Coordinates
-	real, allocatable :: ixx_snap(:), iyy_snap(:), izz_snap(:)      ! Inertia moments
-        real, allocatable :: ixy_snap(:), ixz_snap(:), iyz_snap(:)
-        real, allocatable :: cv_snap(:)                                 ! Cell volume
-
-	real, allocatable :: x_2(:), y_2(:), z_2(:)
-
-	integer, allocatable :: pos_ind(:)
+  	real, allocatable    :: x_snap(:), y_snap(:), z_snap(:)        ! Coordinates
+	real, allocatable    :: ixx_snap(:), iyy_snap(:), izz_snap(:)  ! Inertia moments
+        real, allocatable    :: ixy_snap(:), ixz_snap(:), iyz_snap(:)
+        real, allocatable    :: cv_snap(:)                             ! Cell volume
+	real, allocatable    :: x_2(:), y_2(:), z_2(:)                 ! Coordinates for sorting                    
+	integer, allocatable :: pos_ind(:)                             ! Integer for sorting
 
   end type
 
   type(Snapshot) :: Snap
       
-    integer :: c = 0    
+    integer :: c = 0 
+    integer :: iunit
             
 !==============================================================================!
 
-  ! Creation of a .txt file containing the cells' coordinates and the inertias
-
-  open (unit=1, file='Inertia_uns.txt', form='formatted', status='unknown')
+  ! Creation of a .txt file containing the cells' coordinates and the inertia moments
+  open (newunit=iunit, file='Inertia_uns.txt', form='formatted', status='unknown')
 
   do c = 1, Grid % n_cells 
   
-	write (1, *) Grid % xc(c),  &
-                     Grid % yc(c),  &
-                     Grid % zc(c),  &                    
-		     Grid % ixx(c), &
-  		     Grid % iyy(c), &
-	             Grid % izz(c), &
-                     Grid % ixy(c), &
-		     Grid % ixz(c), &
-                     Grid % iyz(c), &
-                     Grid % vol(c)
-                                         
+	write (iunit, *) Grid % xc(c),  &
+                         Grid % yc(c),  &
+                         Grid % zc(c),  &                    
+		         Grid % ixx(c), &
+  		         Grid % iyy(c), &
+	                 Grid % izz(c), &
+                         Grid % ixy(c), &
+		         Grid % ixz(c), &
+                         Grid % iyz(c), &
+                         Grid % vol(c)                                         
   end do
   
-  close (1)
+  close (iunit)
 
   ! Opening of the .txt file created to store the variables in the Snapshot
-
   allocate(Snap % x_snap(Grid % n_cells));     Snap % x_snap = 0.0
   allocate(Snap % y_snap(Grid % n_cells));     Snap % y_snap = 0.0
   allocate(Snap % z_snap(Grid % n_cells));     Snap % z_snap = 0.0
