@@ -10,6 +10,8 @@
   interface
     include '../Shared/Probe_1d_Nodes.h90'
   end interface
+!------------------------------[Local parameters]------------------------------!
+  logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type) :: Grid(2)        ! grid to be converted and its dual
   character(SL)   :: answer
@@ -54,7 +56,7 @@
   Grid(1) % name = problem_name(1)
   call String % To_Upper_Case(Grid(1) % name)
   city = .false.
-  if(l > 10) then
+  if(l .ge. 10) then
     app_up = problem_name(1)(l-7:l-4)
     call String % To_Upper_Case(app_up)
     if(app_up .eq. 'CITY') city = .true.
@@ -152,12 +154,14 @@
 
     ! Keep in mind that Grid_Mod_Calculate_Wall_Distance is ...
     ! ... faster if it is called after Grid_Mod_Sort_Faces_Smart
-    call Grid(g) % Sort_Cells_Smart       ()
-    call Grid(g) % Sort_Faces_Smart       ()
+    call Grid(g) % Sort_Cells_Smart()
+
+    call Grid(g) % Sort_Faces_Smart()
     if( (g-n_grids) .eq. 0) then
       call Grid(g) % Calculate_Wall_Distance()
     end if
-    call Grid(g) % Find_Cells_Faces       ()
+    call Grid(g) % Find_Cells_Faces()
+    if(DEBUG) call Grid(g) % Check_Cells_Closure()
 
     call Grid(g) % Initialize_New_Numbers()
 

@@ -20,9 +20,6 @@
   interface
     include '../Shared/Adjust_First_Dim.h90'
   end interface
-!------------------------------[Local parameters]------------------------------!
-  integer, parameter :: INWARDS  = -1  ! for faces wrapping cells, can ...
-  integer, parameter :: OUTWARDS = +1  ! ... be pointing inwards or outwards
 !==============================================================================!
 
   !---------------!
@@ -90,9 +87,6 @@
     integer, allocatable :: cells_n(:,:)
     integer, allocatable :: cells_f(:,:)
     integer, allocatable :: cells_c(:,:)
-
-    ! Orientation (INWARDS, or OUTWARDS) of faces sourrounding the cells
-    integer, allocatable :: cells_f_orient(:,:)
 
     ! Weights for interpolation from nodes
     real, allocatable :: weight_n2c(:,:)
@@ -202,17 +196,20 @@
       procedure :: Calculate_Wall_Distance
       procedure :: Calculate_Weights_Cells_To_Nodes
       procedure :: Calculate_Weights_Nodes_To_Cells
+      procedure :: Check_Cells_Closure
+      procedure :: Correct_Face_Surfaces
       procedure :: Decompose
-      procedure :: Determine_Face_Orientation
       procedure :: Exchange_Cells_Int
       procedure :: Exchange_Cells_Log
       procedure :: Exchange_Cells_Real
       procedure :: Face_Normal
+      procedure :: Faces_Surface
       procedure :: Find_Cells_Faces
       procedure :: Find_Nodes_Cells
       procedure :: Form_Cells_Comm
       procedure :: Form_Maps
       procedure :: Initialize_New_Numbers
+      procedure :: Is_Face_In_Cell
       procedure :: Is_Point_In_Cell
       procedure :: Load_Cfn
       procedure :: Load_Dim
@@ -251,12 +248,14 @@
 #   include "Grid_Mod/Calculate_Face_Geometry.f90"
 #   include "Grid_Mod/Calculate_Face_Interpolation.f90"
 #   include "Grid_Mod/Calculate_Face_Surfaces.f90"
+#   include "Grid_Mod/Calculate_Faces_Surface.f90"
 #   include "Grid_Mod/Calculate_Global_Volumes.f90"
 #   include "Grid_Mod/Calculate_Wall_Distance.f90"
 #   include "Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90"
 #   include "Grid_Mod/Calculate_Weights_Nodes_To_Cells.f90"
+#   include "Grid_Mod/Correct_Face_Surfaces.f90"
+#   include "Grid_Mod/Check_Cells_Closure.f90"
 #   include "Grid_Mod/Decompose.f90"
-#   include "Grid_Mod/Determine_Face_Orientation.f90"
 #   include "Grid_Mod/Exchange_Cells_Int.f90"
 #   include "Grid_Mod/Exchange_Cells_Log.f90"
 #   include "Grid_Mod/Exchange_Cells_Real.f90"
@@ -266,6 +265,7 @@
 #   include "Grid_Mod/Form_Cells_Comm.f90"
 #   include "Grid_Mod/Form_Maps.f90"
 #   include "Grid_Mod/Initialize_New_Numbers.f90"
+#   include "Grid_Mod/Is_Face_In_Cell.f90"
 #   include "Grid_Mod/Is_Point_In_Cell.f90"
 #   include "Grid_Mod/Load_Cfn.f90"
 #   include "Grid_Mod/Load_Dim.f90"

@@ -7,11 +7,17 @@
   type(Grid_Type)     :: Grid
   integer, intent(in) :: cell
   real                :: phi_n(:)
+!------------------------------[Local parameters]------------------------------!
+  logical, parameter :: DEBUG = .false.  ! if true, a lot of files are created
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: local_face_nodes(MAX_ISOAP_VERTS)
-  integer :: i_nod, i_fac, i_ver, i_iso, l_nod
-  integer :: s, n, faces_n_nodes
+  integer, pointer, contiguous :: glo(:)
+  integer                      :: local_face_nodes(MAX_ISOAP_VERTS)
+  integer                      :: i_nod, i_fac, i_ver, i_iso, l_nod
+  integer                      :: s, n, faces_n_nodes
 !==============================================================================!
+
+  ! Take alias for global cell numbers
+  glo => Grid % Comm % cell_glo
 
   !-------------------------------------------------------------------------!
   !   On the first visit, allocate memory for polyhedron and iso-polygons   !
@@ -25,6 +31,11 @@
   !------------------------!
   call Polyhedron % Extract_From_Grid(Grid, cell, phi_n)
 
+  if(DEBUG) then
+    ! This will create "extract-cell-000XXX.vtk"
+    call Polyhedron % Plot_Polyhedron_Vtk("extract-cell", glo(cell))
+  end if
+
   !---------------------------------!
   !   (Re)initialize Iso_Polygons   !
   !---------------------------------!
@@ -36,15 +47,15 @@
   Iso_Polygons % b_node_1     (:)   = 0
   Iso_Polygons % b_node_2     (:)   = 0
 
-  ! Plot extracted cell first, in case things go wrong
-  ! call Polyhedron % Plot_Polyhedron_Vtk(cell)
-
   !------------------------------!
   !   Call the Isoap algorithm   !
   !------------------------------!
   call Isoap % Main_Isoap(Polyhedron, Iso_Polygons)
 
   ! Plot extracted polygons
-  ! call Iso_Polygons % Plot_Iso_Polygons_Vtk(cell)
+  if(DEBUG) then
+     ! This will create "extract-iso-000XXX.vtk"
+     call Iso_Polygons % Plot_Iso_Polygons_Vtk("extract-iso", glo(cell))
+  end if
 
   end subroutine

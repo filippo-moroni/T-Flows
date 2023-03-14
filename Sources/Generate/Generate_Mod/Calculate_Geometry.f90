@@ -2,6 +2,14 @@
   subroutine Calculate_Geometry(Generate, Grid, real_run)
 !------------------------------------------------------------------------------!
 !   Calculates geometrical quantities of the grid.                             !
+!                                                                              !
+!   This subroutine has a sibling in Convert_Mod, with the same name.  They    !
+!   can never be quite the same, unfortunatelly, because the data they start   !
+!   with is different.                                                         !
+!                                                                              !
+!   One of the most distinct differences is the treatment of periodicity.      !
+!   Here, periodic faces are added to the existing (internal) ones, whereas    !
+!   in Convert_Mod, existing faces are turned into periodic ones.              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -129,7 +137,6 @@
   !-----------------------------------------!
   call Grid % Calculate_Cell_Centers()
 
-  !-----------------------------------------------------!
   !----------------------------------!
   !   Calculate face surface areas   !
   !----------------------------------!
@@ -171,6 +178,7 @@
   end do ! through faces
 
   if(real_run) then
+
     !---------------------------------------------!
     !   Find the faces on the periodic boundary   !
     !---------------------------------------------!
@@ -178,7 +186,7 @@
     !   <= gives:      dx,dy,dz                   !
     !---------------------------------------------!
 
-    ! Initialize variables for Grid periodicity   
+    ! Initialize variables for Grid periodicity
     n_per = 0
     Grid % per_x = 0.0
     Grid % per_y = 0.0
@@ -307,7 +315,7 @@
     !   Calculate the interpolation factors for the cell faces   !
     !------------------------------------------------------------!
     call Grid % Calculate_Face_Interpolation()
-  end if
+  end if  ! real_run
 
   call Profiler % Stop('Calculate_Geometry')
 

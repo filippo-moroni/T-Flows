@@ -15,10 +15,19 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, phi
+  integer                  :: c
 !==============================================================================!
 
   ! Take aliases
   Grid => Flow % pnt_grid
+  t    => Flow % t
+
+! ! A way to implement boundary condition which varies in time
+! do c = -Grid % n_bnd_cells, -1
+!   if(Grid % Bnd_Cond_Name(c) .eq. 'HOT_WALL') then
+!     t % n(c) = min(1.0, time / 300.0)
+!   end if
+! end do
 
   end subroutine
 

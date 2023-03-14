@@ -2,6 +2,14 @@
   subroutine Calculate_Geometry(Convert, Grid, ask)
 !------------------------------------------------------------------------------!
 !   Calculates geometrical quantities of the grid.                             !
+!                                                                              !
+!   This subroutine has a sibling in Generate_Mod, with the same name.  They   !
+!   can never be quite the same, unfortunatelly, because the data they start   !
+!   with is different.                                                         !
+!                                                                              !
+!   One of the most distinct differences is the treatment of periodicity.      !
+!   Here, periodic faces are created from existing (internal) ones, whereas    !
+!   in Generate_Mod, they are added to existing cells.                         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -250,6 +258,15 @@
   Grid % dx(:) = 0.0
   Grid % dy(:) = 0.0
   Grid % dz(:) = 0.0
+
+  !-----------------------------------------------------!
+  !   For polyhedral grids, faces can be messy.         !
+  !   This is the first place where they can be fixed   !
+  !-----------------------------------------------------!
+  !   => depends on:                                    !
+  !   <= gives:                                         !
+  !-----------------------------------------------------!
+  call Grid % Correct_Face_Surfaces()
 
   !--------------------------------------------!
   !   Find the faces on the periodic boundary  !
@@ -572,7 +589,10 @@
   !----------------------------------------------------!
   n1 = 0
   n2 = 0
+
+  ! At this point, Grid % n_faces includes shadow faces too
   do s = 1, Grid % n_faces
+
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
@@ -585,12 +605,14 @@
 
     !----------------------------------------------------------!
     !   If it is not, change the orientations of the surface   !
+    !   (Shadow faces, which are at this point included in     !
+    !    the Grid % n_faces count, have c1 and c2 set to 0)    !
     !----------------------------------------------------------!
-    if(prod < 0) then
+    if(prod < 0 .and. c1 > 0 .and. c2 > 0) then
 
       ! Increase the counters
-      if(c2 > 0) n1 = n1 + 1
-      if(c2 < 0) n2 = n2 + 1
+      if(c2 .gt. 0) n1 = n1 + 1
+      if(c2 .lt. 0) n2 = n2 + 1
 
       ! Reverse the order of face's nodes
       n = Grid % faces_n_nodes(s)  ! number of nodes in this face

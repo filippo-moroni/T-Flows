@@ -14,21 +14,30 @@
   class(Grid_Type)    :: Grid
   integer, intent(in) :: sub, nn_sub, nc_sub, nf_sub, ns_sub, nbc_sub
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, n, s, fu, c1, c2, ss, sr
-  character(SL) :: name_out
+  integer              :: c, n, i_nod, s, fu, c1, c2, ss, sr
+  integer, allocatable :: faces_n(:)
+  character(SL)        :: name_out
 !==============================================================================!
 
   call Profiler % Start('Save_Cfn')
 
+  ! Allocate memory for locals
+  n = size(Grid % faces_n, 1)
+  Assert(n .le. maxval(Grid % faces_n_nodes))
+  allocate(faces_n(n))
+
   !----------------------!
-  !                      !
   !   Create .cfn file   !
-  !                      !
   !----------------------!
   call File % Set_Name(name_out,         &
                        processor=sub,    &
                        extension='.cfn')
   call File % Open_For_Writing_Binary(name_out, fu)
+
+  !-------------------------!
+  !   Save real precision   !
+  !-------------------------!
+  write(fu) RP
 
   !-----------------------------------------------!
   !   Number of cells, boundary cells and faces   !
@@ -62,7 +71,7 @@
   !--------------------------!
   do n = 1, Grid % n_nodes
     if(Grid % new_n(n) > 0) then
-      write(fu) Grid % comm % node_glo(n)
+      write(fu) Grid % Comm % node_glo(n)
     end if
   end do
 
@@ -94,8 +103,8 @@
   ! Cells' nodes
   do c = -Grid % n_bnd_cells, Grid % n_cells
     if(Grid % old_c(c) .ne. 0 .or. c .eq. 0) then
-      do n = 1, abs(Grid % cells_n_nodes(Grid % old_c(c)))
-        write(fu) Grid % new_n(Grid % cells_n(n, Grid % old_c(c)))
+      do i_nod = 1, abs(Grid % cells_n_nodes(Grid % old_c(c)))
+        write(fu) Grid % new_n(Grid % cells_n(i_nod, Grid % old_c(c)))
       end do
     end if
   end do
@@ -103,8 +112,8 @@
   ! Error trap for cells' nodes
   do c = -Grid % n_bnd_cells, Grid % n_cells
     if(Grid % old_c(c) .ne. 0 .or. c .eq. 0) then
-      do n = 1, abs(Grid % cells_n_nodes(Grid % old_c(c)))
-        if(Grid % new_n(Grid % cells_n(n, Grid % old_c(c))) .eq. 0) then
+      do i_nod = 1, abs(Grid % cells_n_nodes(Grid % old_c(c)))
+        if(Grid % new_n(Grid % cells_n(i_nod, Grid % old_c(c))) .eq. 0) then
           print *, '# ERROR: Node index is zero at cell:', Grid % old_c(c)
           print *, '# This error is critical.  Exiting!'
           call Comm_Mod_End
@@ -161,14 +170,14 @@
   ! Cells' processor ids
   do c = -Grid % n_bnd_cells, Grid % n_cells
     if(Grid % old_c(c) .ne. 0 .or. c .eq. 0) then
-      write(fu) Grid % comm % cell_proc(Grid % old_c(c))
+      write(fu) Grid % Comm % cell_proc(Grid % old_c(c))
     end if
   end do
 
   ! Cells' global indices
   do c = -Grid % n_bnd_cells, Grid % n_cells
     if(Grid % old_c(c) .ne. 0 .or. c .eq. 0) then
-      write(fu) Grid % comm % cell_glo(Grid % old_c(c))
+      write(fu) Grid % Comm % cell_glo(Grid % old_c(c))
     end if
   end do
 
@@ -198,17 +207,35 @@
   ! Faces' nodes
   do s = 1, Grid % n_faces + Grid % n_shadows
     if(Grid % old_f(s) .ne. 0) then
-      do n = 1, Grid % faces_n_nodes(Grid % old_f(s))
-        write(fu) Grid % new_n(Grid % faces_n(n, Grid % old_f(s)))
+      c1 = Grid % faces_c(1, Grid % old_f(s))
+      c2 = Grid % faces_c(2, Grid % old_f(s))
+
+      ! Shorten the syntax a bit
+      n = Grid % faces_n_nodes(Grid % old_f(s))
+
+      ! Copy the nodes in local variable
+      do i_nod = 1, n
+        faces_n(i_nod) = Grid % new_n(Grid % faces_n(i_nod, Grid % old_f(s)))
       end do
+
+      ! Write the local variable out taking care of the order
+      if(Grid % new_c(c2) < 0 .or. Grid % new_c(c1) < Grid % new_c(c2)) then
+        do i_nod = 1, n
+          write(fu) faces_n(i_nod)
+        end do
+      else
+        do i_nod = n, 1, -1
+          write(fu) faces_n(i_nod)
+        end do
+      end if
     end if
   end do
 
   ! Error trap for faces' nodes
   do s = 1, Grid % n_faces + Grid % n_shadows
     if(Grid % old_f(s) .ne. 0) then
-      do n = 1, Grid % faces_n_nodes(Grid % old_f(s))
-        if(Grid % new_n(Grid % faces_n(n, Grid % old_f(s))) .eq. 0) then
+      do i_nod = 1, Grid % faces_n_nodes(Grid % old_f(s))
+        if(Grid % new_n(Grid % faces_n(i_nod, Grid % old_f(s))) .eq. 0) then
           print *, '# ERROR: Node index is zero at face:', Grid % old_f(s)
           print *, '# This error is critical.  Exiting!'
           call Comm_Mod_End
@@ -226,8 +253,8 @@
 
       ! At least one cell is in this processor
       ! (Meaning it is not a face entirelly in the buffer)
-      if(Grid % comm % cell_proc(c1) .eq. sub .or.  &
-         Grid % comm % cell_proc(c2) .eq. sub) then
+      if(Grid % Comm % cell_proc(c1) .eq. sub .or.  &
+         Grid % Comm % cell_proc(c2) .eq. sub) then
         if(Grid % new_c(c2) < 0 .or. Grid % new_c(c1) < Grid % new_c(c2)) then
           write(fu) Grid % new_c(c1), Grid % new_c(c2)
         else
@@ -249,8 +276,8 @@
 
       ! Check only if least one cell is in this processor
       ! (Meaning it is not a face entirelly in the buffer)
-      if(Grid % comm % cell_proc(c1) .eq. sub .or.  &
-         Grid % comm % cell_proc(c2) .eq. sub) then
+      if(Grid % Comm % cell_proc(c1) .eq. sub .or.  &
+         Grid % Comm % cell_proc(c2) .eq. sub) then
         if(Grid % new_c(c1) .eq. 0) then
           print *, '# ERROR: Cell one is zero at face:', s
           print *, '# This error is critical.  Exiting!'

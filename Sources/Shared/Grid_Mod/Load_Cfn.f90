@@ -9,21 +9,44 @@
   integer, intent(in) :: this_proc  ! needed if called from Processor
   integer, optional   :: domain
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, c1, c2, s, n, ss, sr, fu
+  integer       :: c, c1, c2, s, n, ss, sr, fu, real_prec
   character(SL) :: name_in
 !==============================================================================!
 
   !-------------------------------!
-  !                               !
   !     Read the file with the    !
   !   connections between cells   !
-  !                               !
   !-------------------------------!
   call File % Set_Name(name_in,              &
                        processor=this_proc,  &
                        extension='.cfn',     &
                        domain=domain)
   call File % Open_For_Reading_Binary(name_in, fu, this_proc)
+
+  !-------------------------!
+  !   Read real precision   !
+  !-------------------------!
+  read(fu) real_prec
+
+  if(real_prec .ne. RP) then
+    if(RP .eq. 8 .and. real_prec .eq. 4) then
+      call Message % Error(64,                                                 &
+                       'Input files were saved in single precision, but '   // &
+                       'this program is compiled in double. Decide in   '   // &
+                       'which precision you want to work, recompile the '   // &
+                       'programs (option REAL=double/single in make), '     // &
+                       'convert or generate the meshes again and re-run.',     &
+                       one_proc = .true.)
+    else
+      call Message % Error(64,                                                 &
+                       'Input files were saved in double precision, but '   // &
+                       'this program is compiled in single. Decide in   '   // &
+                       'which precision you want to work, recompile the '   // &
+                       'programs (option REAL=double/single in make), '     // &
+                       'convert or generate the meshes again and re-run.',     &
+                       one_proc = .true.)
+    end if
+  end if
 
   !-----------------------------------------------!
   !   Number of cells, boundary cells and faces   !
@@ -72,7 +95,7 @@
   !--------------------------!
   !   Nodes global numbers   !
   !--------------------------!
-  read(fu) (Grid % comm % node_glo(n), n = 1, Grid % n_nodes)
+  read(fu) (Grid % Comm % node_glo(n), n = 1, Grid % n_nodes)
 
   !-----------!
   !   Cells   !  (including buffer cells)
@@ -150,10 +173,10 @@
   end do
 
   ! Cells' processor ids
-  read(fu) (Grid % comm % cell_proc(c), c = -Grid % n_bnd_cells, Grid % n_cells)
+  read(fu) (Grid % Comm % cell_proc(c), c = -Grid % n_bnd_cells, Grid % n_cells)
 
   ! Cells' global indices
-  read(fu) (Grid % comm % cell_glo(c), c = -Grid % n_bnd_cells, Grid % n_cells)
+  read(fu) (Grid % Comm % cell_glo(c), c = -Grid % n_bnd_cells, Grid % n_cells)
 
   !-----------!
   !   Faces   !
@@ -203,8 +226,8 @@
 
     ! Check only if least one cell is in this processor
     ! (Meaning it is not a face entirelly in the buffer)
-    if(Grid % comm % cell_proc(c1) .eq. this_proc .or.  &
-       Grid % comm % cell_proc(c2) .eq. this_proc) then
+    if(Grid % Comm % cell_proc(c1) .eq. this_proc .or.  &
+       Grid % Comm % cell_proc(c2) .eq. this_proc) then
       if( .not. (c1.eq.0 .and. c2.eq.0) ) then
         if(Grid % faces_c(1, s) .eq. 0) then
           print *, '# ERROR: Cell one is zero at face:', s, c1, c2

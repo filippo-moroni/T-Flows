@@ -8,6 +8,7 @@
   class(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: s, i_nod, j_nod, m, n
+  real              :: dx, dy, dz
   real, allocatable :: xf(:), yf(:), zf(:)
 !==============================================================================!
 
@@ -32,6 +33,11 @@
     Grid % sx(s) = 0.0
     Grid % sy(s) = 0.0
     Grid % sz(s) = 0.0
+
+    ! I am afraid that this algorithm computes surfaces with wrong sign, but
+    ! it might work afterall since the nodes in "fn" structures (HEX, TET,
+    ! WED and PYR in Convert_Mod) also have nodes sorted in the direction
+    ! which points inwards a cell and not outwards
     do i_nod = 1, Grid % faces_n_nodes(s)
       j_nod = i_nod + 1
       if(j_nod > Grid % faces_n_nodes(s)) j_nod = 1
