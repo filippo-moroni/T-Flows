@@ -125,9 +125,9 @@
   Cl = -Cl / 0.36
   
   ! SubSnapshots creation 
-  if (this_proc < 10) write (filename, "(A5,I1,A4)") "Cd+Cl", this_proc, '.txt'			
-  if (this_proc > 9)  write (filename, "(A5,I2,A4)") "Cd+Cl", this_proc, '.txt'
-  if (this_proc > 99) write (filename, "(A5,I3,A4)") "Cd+Cl", this_proc, '.txt'
+  if (this_proc < 10)                       write (filename, "(A5,I1,A4)") "Cd+Cl", this_proc, '.txt'			
+  if (this_proc > 9 .and. this_proc < 100)  write (filename, "(A5,I2,A4)") "Cd+Cl", this_proc, '.txt'
+  if (this_proc > 99)                       write (filename, "(A5,I3,A4)") "Cd+Cl", this_proc, '.txt'
     
   ! Creation of the SubSnapshots with Cd and Cl  
   open(newunit=iunit,file = trim(filename),status='unknown',form='formatted')
@@ -143,9 +143,9 @@
   
   do j = 1, n_proc									             
     
-      if (j < 10) write (filename, "(A5,I1,A4)") "Cd+Cl", j, '.txt'				     
-      if (j > 9)  write (filename, "(A5,I2,A4)") "Cd+Cl", j, '.txt'
-      if (j > 99) write (filename, "(A5,I3,A4)") "Cd+Cl", j, '.txt'
+      if (j < 10)               write (filename, "(A5,I1,A4)") "Cd+Cl", j, '.txt'				     
+      if (j > 9 .and. j < 100)  write (filename, "(A5,I2,A4)") "Cd+Cl", j, '.txt'
+      if (j > 99)               write (filename, "(A5,I3,A4)") "Cd+Cl", j, '.txt'
   
       open(newunit=iunit,file = trim(filename),form='formatted',status='unknown')	
       
