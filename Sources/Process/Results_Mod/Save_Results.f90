@@ -472,8 +472,9 @@
   
   if(run .eq. 1 .and. plot_inside) then            					     
   			                                                                              													
-    if (this_proc < 10) write (filename, "(A8,I1,A4)") "SnapShot", this_proc, '.txt'		     
-    if (this_proc > 9)  write (filename, "(A8,I2,A4)") "SnapShot", this_proc, '.txt'	             
+    if (this_proc < 10)                       write (filename, "(A8,I1,A4)") "SnapShot", this_proc, '.txt'		     
+    if (this_proc > 9 .and. this_proc < 100)  write (filename, "(A8,I2,A4)") "SnapShot", this_proc, '.txt'
+    if (this_proc > 99)                       write (filename, "(A8,I3,A4)") "SnapShot", this_proc, '.txt' 
   
     open(unit=606+this_proc,file = trim(filename),form='formatted',status='unknown')		     
   
@@ -555,8 +556,9 @@
   
     do j = 1, n_proc									             
     
-      if (j < 10) write (filename, "(A8,I1,A4)") "SnapShot", j, '.txt'				     
-      if (j > 9)  write (filename, "(A8,I2,A4)") "SnapShot", j, '.txt'				     
+      if (j < 10)               write (filename, "(A8,I1,A4)") "SnapShot", j, '.txt'				     
+      if (j > 9 .and. j < 100)  write (filename, "(A8,I2,A4)") "SnapShot", j, '.txt'
+      if (j > 99)               write (filename, "(A8,I3,A4)") "SnapShot", j, '.txt'
   
       open(unit=606+j,file = trim(filename),form='formatted',status='unknown')			     
 
