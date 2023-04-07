@@ -130,7 +130,7 @@
   if (this_proc > 99)                       write (filename, "(A5,I3,A4)") "Cd+Cl", this_proc, '.txt'
     
   ! Creation of the SubSnapshots with Cd and Cl  
-  open(newunit=iunit,file = trim(filename),status='unknown',form='formatted')
+  open(newunit=iunit,file = trim(filename),status='unknown')
   
     	write (iunit, *) Cd, &
                          Cl						       	     	     
@@ -147,7 +147,7 @@
       if (j > 9 .and. j < 100)  write (filename, "(A5,I2,A4)") "Cd+Cl", j, '.txt'
       if (j > 99)               write (filename, "(A5,I3,A4)") "Cd+Cl", j, '.txt'
   
-      open(newunit=iunit,file = trim(filename),form='formatted',status='unknown')	
+      open(newunit=iunit,file = trim(filename),status='unknown')	
       
       read (iunit, *,end=10)  Cd, &				             
 		              Cl
@@ -163,9 +163,9 @@
   inquire(file="Cd+Cl_tot.txt", exist=exist)
   
   if (exist) then
-    open(newunit=iunit, file="Cd+Cl_tot.txt", status="old", position="append", action="write")
+    open(newunit=iunit, file="Cd+Cl_tot.txt", status='old', position='append', action='write', form='formatted')
   else
-    open(newunit=iunit, file="Cd+Cl_tot.txt", status="new", action="write")
+    open(newunit=iunit, file="Cd+Cl_tot.txt", status='new', action='write', form='formatted')
   end if
          
   write(iunit, *) n, &
