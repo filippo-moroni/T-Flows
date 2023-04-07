@@ -130,11 +130,11 @@
   if (this_proc > 99)                       write (filename, "(A5,I3,A4)") "Cd+Cl", this_proc, '.txt'
     
   ! Creation of the SubSnapshots with Cd and Cl  
-  open(unit=-288+this_proc,file = trim(filename),status='new')
+  open(unit=1+this_proc,file = trim(filename),status='new')
   
-    	write(-288+this_proc, *) Cd, &
-                                 Cl 			 
-  close(-288+this_proc)
+    	write(1+this_proc, *) Cd, &
+                              Cl 			 
+  close(1+this_proc)
   
 !----------------------------------------------------------!
 
@@ -147,12 +147,12 @@
       if (j > 9 .and. j < 100)  write (filename, "(A5,I2,A4)") "Cd+Cl", j, '.txt'
       if (j > 99)               write (filename, "(A5,I3,A4)") "Cd+Cl", j, '.txt'
   
-      open(unit=-288+this_proc,file = trim(filename),status='old')	
+      open(unit=1+this_proc,file = trim(filename),status='old')	
       
-      read(-288+this_proc, *) Cd, &				             
-   	                      Cl
+      read(1+this_proc, *) Cd, &				             
+   	                   Cl
 		              
-      close(unit=-288+this_proc,status='delete')
+      close(unit=1+this_proc,status='delete')
 	
       Cd_tot = Cd_tot + Cd
       	            
