@@ -47,6 +47,8 @@
   						
   real    :: y_check                   ! To check if we are on the pressure side or not.
   
+  real    :: dummy = 0.0               ! Dummy variable to proper reading of SubSnapshots files.
+  
   logical :: exist
   			
   character(len=1024) :: filename	
@@ -133,7 +135,8 @@
   open(newunit=iunit,file = trim(filename),status='new')
   
     	write (iunit, *) Cd, &
-                         Cl						       	     	     
+                         Cl, &
+			 dummy			 
   close(iunit)
   
 !----------------------------------------------------------!
@@ -149,10 +152,10 @@
   
       open(newunit=iunit,file = trim(filename),status='old')	
       
-      read (iunit, *, end=10)  Cd, &				             
-		               Cl
+      read (iunit, *)  Cd, &				             
+		       Cl
 		              
-      10 close(unit=iunit, status='delete')
+      close(unit=iunit, status='delete')
 	
       Cd_tot = Cd_tot + Cd
       	            
