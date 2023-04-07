@@ -149,10 +149,10 @@
   
       open(newunit=iunit,file = trim(filename),status='old')	
       
-      read (iunit, *)  Cd, &				             
-		       Cl
+      read (iunit, *, end=10)  Cd, &				             
+		               Cl
 		              
-      close(unit=iunit, status='delete')
+      10 close(unit=iunit, status='delete')
 	
       Cd_tot = Cd_tot + Cd
       	            
