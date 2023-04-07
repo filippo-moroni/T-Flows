@@ -47,8 +47,6 @@
   						
   real    :: y_check                   ! To check if we are on the pressure side or not.
   
-  real    :: dummy = 0.0               ! Dummy variable to proper reading of SubSnapshots files.
-  
   logical :: exist
   			
   character(len=1024) :: filename	
@@ -132,12 +130,11 @@
   if (this_proc > 99)                       write (filename, "(A5,I3,A4)") "Cd+Cl", this_proc, '.txt'
     
   ! Creation of the SubSnapshots with Cd and Cl  
-  open(newunit=iunit,file = trim(filename),status='new')
+  open(unit=-288+this_proc,file = trim(filename),status='new')
   
-    	write (iunit, *) Cd, &
-                         Cl, &
-			 dummy			 
-  close(iunit)
+    	write(-288+this_proc, *) Cd, &
+                                 Cl 			 
+  close(-288+this_proc)
   
 !----------------------------------------------------------!
 
@@ -150,12 +147,12 @@
       if (j > 9 .and. j < 100)  write (filename, "(A5,I2,A4)") "Cd+Cl", j, '.txt'
       if (j > 99)               write (filename, "(A5,I3,A4)") "Cd+Cl", j, '.txt'
   
-      open(newunit=iunit,file = trim(filename),status='old')	
+      open(unit=-288+this_proc,file = trim(filename),status='old')	
       
-      read (iunit, *)  Cd, &				             
-		       Cl
+      read(-288+this_proc, *) Cd, &				             
+   	                      Cl
 		              
-      close(unit=iunit, status='delete')
+      close(unit=-288+this_proc,status='delete')
 	
       Cd_tot = Cd_tot + Cd
       	            
@@ -166,16 +163,16 @@
   inquire(file="Cd+Cl_tot.txt", exist=exist)
   
   if (exist) then
-    open(newunit=iunit, file="Cd+Cl_tot.txt", status='old', position='append', action='write', form='formatted')
+    open(unit=1, file="Cd+Cl_tot.txt", status='old', position='append', action='write', form='formatted')
   else
-    open(newunit=iunit, file="Cd+Cl_tot.txt", status='new', action='write', form='formatted')
+    open(unit=1, file="Cd+Cl_tot.txt", status='new', action='write', form='formatted')
   end if
          
-  write(iunit, *) n, &
-  		  Cd_tot, &
-  		  Cl_tot
+  write(1, *) n, &
+  	      Cd_tot, &
+              Cl_tot
   		
-  close(iunit)
+  close(1)
   
   end if
   
