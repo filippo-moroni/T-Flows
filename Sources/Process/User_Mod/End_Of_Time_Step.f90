@@ -134,8 +134,7 @@
   ! Creation of the SubSnapshots with Cd and Cl  
   open(unit=1+this_proc,file = trim(filename),form='formatted',status='new')
   
-    	write(1+this_proc, *) Cd
-        write(1+this_proc, *) Cl 
+    	write(1+this_proc, *) Cd, Cl 
 	
   close(1+this_proc)
   
@@ -152,8 +151,7 @@
   
       open(unit=1+j,file = trim(filename),form='formatted',status='old')	
       
-      read(1+j, *) Cd_read				             
-      read(1+j, *) Cl_read
+      read(1+j, *) Cd_read, Cl_read
 		              
       close(unit=1+j,status='delete')
 	
