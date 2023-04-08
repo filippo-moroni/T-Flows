@@ -151,13 +151,12 @@
   
       open(unit=651+j,file = trim(filename),form='formatted',status='unknown')	
       
-      read(651+j, *) Cd_read, Cl_read
-		              
-      close(unit=651+j,status='delete')
+      read(651+j, *, end=10) Cd_read, Cl_read
 	
-      Cd_tot = Cd_tot + Cd_read
-      	            
-      Cl_tot = Cl_tot + Cl_read
+      10 close(unit=651+j,status='delete')
+      
+      Cd_tot = Cd_tot + Cd_read 	            
+      Cl_tot = Cl_tot + Cl_read  
            
   end do
   
@@ -170,8 +169,8 @@
   end if
          
   write(796, *) n, &
-  	      Cd_tot, &
-              Cl_tot
+  	        Cd_tot, &
+                Cl_tot
   		
   close(796)
   
