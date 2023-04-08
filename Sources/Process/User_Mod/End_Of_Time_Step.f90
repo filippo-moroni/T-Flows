@@ -123,7 +123,6 @@
   ! Reference quantities: u_ref = 1 [m/s], c = 1 [m] and b = 0.6 [m]
   
   Cd = -Cd / 0.36
-  
   Cl = -Cl / 0.36
   
   ! SubSnapshots creation 
