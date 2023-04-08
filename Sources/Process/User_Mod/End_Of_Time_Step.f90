@@ -131,12 +131,18 @@
   if (this_proc > 99)                       write (filename, "(A5,I3,A4)") "Cd+Cl", this_proc, '.txt'
     
   ! Creation of the SubSnapshots with iteration number, Cd and Cl  
-  open(unit=651+this_proc,file = trim(filename),form='formatted',status='unknown')
+  inquire(file=trim(filename), exist=exist)
+  
+  if (exist) then
+  open(unit=651+this_proc, file = trim(filename), status='old', position='append', action='write', form='formatted')
+  	else
+  open(unit=651+this_proc, file = trim(filename), status='new', action='write', form='formatted')
+  end if
   
     	write(651+this_proc, *) n, Cd, Cl 
 	
   close(651+this_proc)
    
   end if ! Main if
-   
+     
   end subroutine
