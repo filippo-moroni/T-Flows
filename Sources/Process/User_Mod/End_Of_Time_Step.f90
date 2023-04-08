@@ -35,6 +35,8 @@
   real :: Cd = 0.0
   real :: Cl_tot = 0.0
   real :: Cd_tot = 0.0
+  real :: Cl_read = 0.0
+  real :: Cd_read = 0.0
   
   integer :: iunit
   integer :: s,c1,c2 				
@@ -150,14 +152,14 @@
   
       open(unit=1+this_proc,file = trim(filename),form='formatted',status='old')	
       
-      read(1+this_proc, *) Cd				             
-      read(1+this_proc, *) Cl
+      read(1+this_proc, *) Cd_read				             
+      read(1+this_proc, *) Cl_read
 		              
       close(unit=1+this_proc,status='delete')
 	
-      Cd_tot = Cd_tot + Cd
+      Cd_tot = Cd_tot + Cd_read
       	            
-      Cl_tot = Cl_tot + Cl
+      Cl_tot = Cl_tot + Cl_read
            
   end do
   
