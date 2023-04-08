@@ -150,12 +150,12 @@
       if (j > 9 .and. j < 100)  write (filename, "(A5,I2,A4)") "Cd+Cl", j, '.txt'
       if (j > 99)               write (filename, "(A5,I3,A4)") "Cd+Cl", j, '.txt'
   
-      open(unit=1+this_proc,file = trim(filename),form='formatted',status='old')	
+      open(unit=1+j,file = trim(filename),form='formatted',status='old')	
       
-      read(1+this_proc, *) Cd_read				             
-      read(1+this_proc, *) Cl_read
+      read(1+j, *) Cd_read				             
+      read(1+j, *) Cl_read
 		              
-      close(unit=1+this_proc,status='delete')
+      close(unit=1+j,status='delete')
 	
       Cd_tot = Cd_tot + Cd_read
       	            
