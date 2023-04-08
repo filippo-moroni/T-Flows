@@ -45,8 +45,7 @@
   						
   real    :: y_check                   ! To check if we are on the pressure side or not.
   
-  logical :: exist
-  			
+  logical :: exist			
   character(len=1024) :: filename	
 !==============================================================================!
 
