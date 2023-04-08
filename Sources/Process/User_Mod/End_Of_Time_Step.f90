@@ -2,8 +2,8 @@
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
                                        n, n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
-! This function is called at the end of time step and calculates Cd and Cl     !
-! every 20 time steps.                                                         !
+! This function is called at the end of the time step and calculates Cd and Cl !
+! every 20 time steps for each subdomain.                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -33,11 +33,7 @@
   
   real :: Cl = 0.0
   real :: Cd = 0.0
-  real :: Cl_tot = 0.0
-  real :: Cd_tot = 0.0
-  real :: Cl_read = 0.0
-  real :: Cd_read = 0.0
-  
+
   integer :: iunit
   integer :: s,c1,c2 				
   integer :: j = 0
@@ -66,9 +62,6 @@
   Cd = 0.0
   Cl = 0.0 
   
-  Cd_tot = 0.0
-  Cl_tot = 0.0
-    
   ! Browse through all cells and select the airfoil boundary
   do s = 1, Grid % n_faces
   
