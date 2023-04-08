@@ -131,51 +131,13 @@
   if (this_proc > 9 .and. this_proc < 100)  write (filename, "(A5,I2,A4)") "Cd+Cl", this_proc, '.txt'
   if (this_proc > 99)                       write (filename, "(A5,I3,A4)") "Cd+Cl", this_proc, '.txt'
     
-  ! Creation of the SubSnapshots with Cd and Cl  
+  ! Creation of the SubSnapshots with iteration number, Cd and Cl  
   open(unit=651+this_proc,file = trim(filename),form='formatted',status='unknown')
   
-    	write(651+this_proc, *) Cd, Cl 
+    	write(651+this_proc, *) n, Cd, Cl 
 	
   close(651+this_proc)
-  
-!----------------------------------------------------------!
-
-  ! Creation of the total output
-  if (this_proc .eq. n_proc) then
-  
-  do j = 1, n_proc									             
-    
-      if (j < 10)               write (filename, "(A5,I1,A4)") "Cd+Cl", j, '.txt'				     
-      if (j > 9 .and. j < 100)  write (filename, "(A5,I2,A4)") "Cd+Cl", j, '.txt'
-      if (j > 99)               write (filename, "(A5,I3,A4)") "Cd+Cl", j, '.txt'
-  
-      open(unit=651+j,file = trim(filename),form='formatted',status='unknown')	
-      
-      read(651+j, *, end=10) Cd_read, Cl_read
-	
-      10 close(unit=651+j,status='delete')
-      
-      Cd_tot = Cd_tot + Cd_read 	            
-      Cl_tot = Cl_tot + Cl_read  
-           
-  end do
-  
-  inquire(file="Cd+Cl_tot.txt", exist=exist)
-  
-  if (exist) then
-    open(unit=796, file="Cd+Cl_tot.txt", status='old', position='append', action='write', form='formatted')
-  else
-    open(unit=796, file="Cd+Cl_tot.txt", status='new', action='write', form='formatted')
-  end if
-         
-  write(796, *) n, &
-  	        Cd_tot, &
-                Cl_tot
-  		
-  close(796)
-  
-  end if
-  
+   
   end if ! Main if
    
   end subroutine
