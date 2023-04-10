@@ -12,41 +12,60 @@
   type(Swarm_Type),    target :: Swarm
   integer, intent(in)         :: curr_dt  ! time step
   real,    intent(in)         :: time     ! physical time
-!==============================================================================!
-
-  integer           :: tot_iter = 20000
-  integer           :: l
-  real, allocatable :: Cl(:) = 0.0
-  real, allocatable :: Cd(:) = 0.0
+!-----------------------------------[Locals]-----------------------------------!
+  integer              :: tot_iter = 15000		! Maximum number of iterations in a single run, to allocate memory.
+  integer              :: c = 0
+  real,    allocatable :: Cl(:) = 0.0
+  real,    allocatable :: Cd(:) = 0.0
+  integer, allocatable :: n(:) = 0
   
-  real, allocatable :: Cl_tot(:) = 0.0
-  real, allocatable :: Cd_tot(:) = 0.0
-  
+  real,    allocatable :: Cl_tot(:) = 0.0
+  real,    allocatable :: Cd_tot(:) = 0.0
+  integer, allocatable :: n_tot(:) = 0
+   
   logical :: exist		
-  character(len=1024) :: filename	
-  
+  character(len=1024) :: filename
+!==============================================================================!
+	  
 ! Creation of the total output of Cd and Cl
   if (this_proc .eq. n_proc) then
   
-  allocate
-
-  do j = 1, n_proc									             
+  allocate(n(tot_iter));	n(:)=0
+  allocate(Cd(tot_iter));	Cd(:)=0.0
+  allocate(Cl(tot_iter));	Cl(:)=0.0
+  
+  allocate(n_tot(tot_iter));	n_tot(:)=0
+  allocate(Cd_tot(tot_iter));	Cd_tot(:)=0.0
+  allocate(Cl_tot(tot_iter));	Cl_tot(:)=0.0
+  
+  ! Open and sum all the contributions from the SubSnapshot files
+  do j = 1, n_proc
+  
+      c = 0
     
       if (j < 10)               write (filename, "(A5,I1,A4)") "Cd+Cl", j, '.txt'				     
       if (j > 9 .and. j < 100)  write (filename, "(A5,I2,A4)") "Cd+Cl", j, '.txt'
       if (j > 99)               write (filename, "(A5,I3,A4)") "Cd+Cl", j, '.txt'
   
-      open(unit=651+j,file = trim(filename),form='formatted',status='unknown')	
+      open(unit=651+j,file = trim(filename),form='formatted',status='old')	
       
-      read(651+j, *, end=10) Cd, Cl
+      do
+      
+      read(651+j, *, end=17) n(c+1), Cd(c+1), Cl(c+1)
+      
+      n_tot(c+1) = n_tot(c+1) + n(c+1)
+      Cd_tot(c+1) = Cd_tot(c+1) + Cd(c+1)
+      Cl_tot(c+1) = Cl_tot(c+1) + Cl(c+1)
+   
+      c = c + 1		! Total number of rows in the SubSnapshot files
+      
+      end do
 	
-      10 close(unit=651+j,status='delete')
-      
-      Cd_tot = Cd_tot + Cd_read 	            
-      Cl_tot = Cl_tot + Cl_read  
-           
+      17 close(unit=651+j,status='delete')  
+    
   end do
   
+  ! Create the final overall file or update it
   inquire(file="Cd+Cl_tot.txt", exist=exist)
   
   if (exist) then
