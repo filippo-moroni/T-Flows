@@ -14,10 +14,10 @@
   real,    intent(in)         :: time     ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: tot_iter = 15000		! Maximum number of iterations in a single run, to allocate memory.
-  integer              :: c = 0
+  integer              :: c = 0				! Integer to count the number of rows in the SubSnapshots.
   integer              :: i, j
   
-  real,    allocatable :: Cl(:)
+  real,    allocatable :: Cl(:)				
   real,    allocatable :: Cd(:)
   integer, allocatable :: n(:) 
   
@@ -29,7 +29,7 @@
   character(len=1024) :: filename
 !==============================================================================!
 	  
-! Creation of the total output of Cd and Cl
+  ! Creation of the total output of Cd and Cl
   if (this_proc .eq. n_proc) then
   
   allocate(n(tot_iter));	n(:)=0
