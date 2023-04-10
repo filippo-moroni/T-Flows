@@ -68,7 +68,7 @@
   end do
   
   ! Debugging through the check of the number of iterations
-  n_tot = n_tot/c
+  n_tot = n_tot/n_proc
   
   ! Create the final overall file or update it
   inquire(file="Cd+Cl_tot.txt", exist=exist)
@@ -82,10 +82,10 @@
   do i = 1, c
  	 write(796, *) n_tot(i), &
   	               Cd_tot(i), &
-               	       Cl_tot(i)	
- 	 close(796)
-	 
+               	       Cl_tot(i)		 
   end do
+  
+  close(796)
   
   deallocate(n)
   deallocate(Cd)
