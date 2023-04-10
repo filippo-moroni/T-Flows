@@ -16,6 +16,7 @@
   integer              :: tot_iter = 15000		! Maximum number of iterations in a single run, to allocate memory.
   integer              :: c = 0
   integer              :: i, j
+  
   real,    allocatable :: Cl(:)
   real,    allocatable :: Cd(:)
   integer, allocatable :: n(:) 
