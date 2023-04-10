@@ -15,6 +15,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: tot_iter = 15000		! Maximum number of iterations in a single run, to allocate memory.
   integer              :: c = 0
+  integer              :: i, j
   real,    allocatable :: Cl(:) = 0.0
   real,    allocatable :: Cd(:) = 0.0
   integer, allocatable :: n(:) = 0
@@ -65,6 +66,9 @@
     
   end do
   
+  ! Debugging through the check of the number of iterations
+  n_tot = n_tot/c
+  
   ! Create the final overall file or update it
   inquire(file="Cd+Cl_tot.txt", exist=exist)
   
@@ -73,13 +77,22 @@
   else
     open(unit=796, file="Cd+Cl_tot.txt", status='new', action='write', form='formatted')
   end if
-         
-  write(796, *) n, &
-  	        Cd_tot, &
-                Cl_tot
-  		
-  close(796)
   
-  end if
+  do i = 1, c
+ 	 write(796, *) n_tot(i), &
+  	               Cd_tot(i), &
+               	       Cl_tot(i)	
+ 	 close(796)
+	 
+  end do
+  
+  deallocate(n)
+  deallocate(Cd)
+  deallocate(Cl)
+  deallocate(n_tot)
+  deallocate(Cd_tot)
+  deallocate(Cl_tot)
+  
+  end if ! Main if to run with just one processor
 
   end subroutine
