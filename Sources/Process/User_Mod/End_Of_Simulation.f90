@@ -16,13 +16,13 @@
   integer              :: tot_iter = 15000		! Maximum number of iterations in a single run, to allocate memory.
   integer              :: c = 0
   integer              :: i, j
-  real,    allocatable :: Cl(:) = 0.0
-  real,    allocatable :: Cd(:) = 0.0
-  integer, allocatable :: n(:) = 0
+  real,    allocatable :: Cl(:)
+  real,    allocatable :: Cd(:)
+  integer, allocatable :: n(:) 
   
-  real,    allocatable :: Cl_tot(:) = 0.0
-  real,    allocatable :: Cd_tot(:) = 0.0
-  integer, allocatable :: n_tot(:) = 0
+  real,    allocatable :: Cl_tot(:)
+  real,    allocatable :: Cd_tot(:)
+  integer, allocatable :: n_tot(:) 
    
   logical :: exist		
   character(len=1024) :: filename
