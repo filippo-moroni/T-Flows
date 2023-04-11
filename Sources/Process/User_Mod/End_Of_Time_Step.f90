@@ -34,7 +34,6 @@
   real :: Cl = 0.0
   real :: Cd = 0.0
 
-  integer :: iunit
   integer :: s,c1,c2 				
   integer :: j = 0
   integer :: time_interval = 20        ! This parameter controls how many ts are between the Cd and Cl saving
