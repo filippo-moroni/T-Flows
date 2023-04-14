@@ -74,9 +74,9 @@
         + 2.0*Grid % ixzp(c)*dw_dx*dw_dz &
         + 2.0*Grid % iyzp(c)*dw_dy*dw_dz
         
-    Turb % tau_11(c) = -1.0/omega*t11
-    Turb % tau_22(c) = -1.0/omega*t22
-    Turb % tau_33(c) = -1.0/omega*t33
+    Turb % tau_11(c) = -t11/omega
+    Turb % tau_22(c) = -t22/omega
+    Turb % tau_33(c) = -t33/omega
                       
     ! Deviatoric components
     t12 =     Grid % ixxp(c)*(2.0*dv_dx*du_dx)           &
@@ -100,9 +100,9 @@
         + 2.0*Grid % ixzp(c)*(dw_dx*dv_dz + dw_dz*dv_dx) &
         + 2.0*Grid % iyzp(c)*(dw_dy*dv_dz + dw_dz*dv_dy)
         
-    Turb % tau_12(c) = -0.5/omega*t12
-    Turb % tau_13(c) = -0.5/omega*t13
-    Turb % tau_23(c) = -0.5/omega*t23
+    Turb % tau_12(c) = -0.5*t12/omega
+    Turb % tau_13(c) = -0.5*t13/omega
+    Turb % tau_23(c) = -0.5*t23/omega
 
   end do
 
