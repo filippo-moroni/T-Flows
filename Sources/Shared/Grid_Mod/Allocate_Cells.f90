@@ -31,7 +31,15 @@
   allocate(Grid % ixy(-nb:nc));  Grid % ixy(:) = 0.0
   allocate(Grid % ixz(-nb:nc));  Grid % ixz(:) = 0.0
   allocate(Grid % iyz(-nb:nc));  Grid % iyz(:) = 0.0
-
+  
+  ! Memory for cells' inertia prime tensors
+  allocate(Grid % ixxp(-nb:nc));  Grid % ixxp(:) = 0.0
+  allocate(Grid % iyyp(-nb:nc));  Grid % iyyp(:) = 0.0
+  allocate(Grid % izzp(-nb:nc));  Grid % izzp(:) = 0.0
+  allocate(Grid % ixyp(-nb:nc));  Grid % ixyp(:) = 0.0
+  allocate(Grid % ixzp(-nb:nc));  Grid % ixzp(:) = 0.0
+  allocate(Grid % iyzp(-nb:nc));  Grid % iyzp(:) = 0.0
+  
   ! Allocate as litle as possible
   allocate(Grid % cells_n(4, -nb:nc));  Grid % cells_n(:,:) = 0
   allocate(Grid % cells_f(4, -nb:nc));  Grid % cells_f(:,:) = 0
