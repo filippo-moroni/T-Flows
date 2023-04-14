@@ -752,6 +752,7 @@
   !   Calculate cell inertia tensors   !
   !------------------------------------!
   call Grid % Calculate_Cell_Inertia()
+  call Grid % Calculate_Inertia_Prime()
 
   !------------------------------------------------------------!
   !   Calculate the interpolation factors for the cell faces   !
