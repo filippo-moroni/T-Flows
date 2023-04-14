@@ -103,12 +103,6 @@
     Turb % tau_12(c) = -0.5/omega*t12
     Turb % tau_13(c) = -0.5/omega*t13
     Turb % tau_23(c) = -0.5/omega*t23
-                      
-    Turb % tau_21(c) = Turb % tau_12(c)
-
-    Turb % tau_31(c) = Turb % tau_13(c)
-
-    Turb % tau_32(c) = Turb % tau_23(c)
 
   end do
 
