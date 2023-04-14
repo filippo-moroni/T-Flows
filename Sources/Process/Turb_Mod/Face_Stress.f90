@@ -65,17 +65,17 @@
       tau_k3 =      Grid % fw(s)  * Turb % tau_13(c1)  &
              + (1.0-Grid % fw(s)) * Turb % tau_13(c2)
     else if(ui % name .eq. 'V') then
-      tau_k1 =      Grid % fw(s)  * Turb % tau_21(c1)  &
-             + (1.0-Grid % fw(s)) * Turb % tau_21(c2)
+      tau_k1 =      Grid % fw(s)  * Turb % tau_12(c1)  &
+             + (1.0-Grid % fw(s)) * Turb % tau_12(c2)
       tau_k2 =      Grid % fw(s)  * Turb % tau_22(c1)  &
              + (1.0-Grid % fw(s)) * Turb % tau_22(c2)
       tau_k3 =      Grid % fw(s)  * Turb % tau_23(c1)  &
              + (1.0-Grid % fw(s)) * Turb % tau_23(c2)
     else if(ui % name .eq. 'W') then
-      tau_k1 =      Grid % fw(s)  * Turb % tau_31(c1)  &
-             + (1.0-Grid % fw(s)) * Turb % tau_31(c2)
-      tau_k2 =      Grid % fw(s)  * Turb % tau_32(c1)  &
-             + (1.0-Grid % fw(s)) * Turb % tau_32(c2)
+      tau_k1 =      Grid % fw(s)  * Turb % tau_13(c1)  &
+             + (1.0-Grid % fw(s)) * Turb % tau_13(c2)
+      tau_k2 =      Grid % fw(s)  * Turb % tau_23(c1)  &
+             + (1.0-Grid % fw(s)) * Turb % tau_23(c2)
       tau_k3 =      Grid % fw(s)  * Turb % tau_33(c1)  &
              + (1.0-Grid % fw(s)) * Turb % tau_33(c2)
     end if
