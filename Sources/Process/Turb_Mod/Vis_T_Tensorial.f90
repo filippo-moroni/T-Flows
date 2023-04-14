@@ -1,8 +1,7 @@
 !==============================================================================!
   subroutine Vis_T_Tensorial(Turb)
 !------------------------------------------------------------------------------!
-!   Calculates the non-linear, tensorial "viscosity", and the associated SGS   !
-!   stress tensor.                                                             !
+! Calculates the subgrid stress tensor of TVM model.                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -16,12 +15,9 @@
   real                      :: du_dx, du_dy, du_dz
   real                      :: dv_dx, dv_dy, dv_dz
   real                      :: dw_dx, dw_dy, dw_dz
-  real                      :: sgv_x , sgv_y , sgv_z
-  real                      :: sgv_xy, sgv_yx, sgv_xz
-  real                      :: sgv_zx, sgv_yz, sgv_zy
 !------------------------------------------------------------------------------!
 !                                                                              !
-!   nii_ki = (1/2*Vol) * I'_kh * dUi/dxh                                       !
+! tau_ij = - I'_kh/omega*[(du_j/dx_h)(du_i/dx_k) + (du_i/dx_h)(du_j/dx_k)      !
 !                                                                              !
 !==============================================================================!
 
