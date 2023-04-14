@@ -45,10 +45,8 @@
     dw_dy = w % y(c)  ! dW/dy
     dw_dz = w % z(c)  ! dW/dz
 
-    ! Now actually build the thing
-    Turb % tau_11 (c)    = (- sgv_x  * du_dx - sgv_x  * du_dx)  &
-                         + (- sgv_yx * du_dy - sgv_yx * du_dy)  &
-                         + (- sgv_zx * du_dz - sgv_zx * du_dz)
+ 
+    Turb % tau_11 (c) = Grid % ixxp(   
 
     Turb % tau_22 (c)    = (- sgv_xy * dv_dx - sgv_xy * dv_dx)  &
                          + (- sgv_y  * dv_dy - sgv_y  * dv_dy)  &
@@ -64,15 +62,7 @@
 
     Turb % tau_21 (c)    = Turb % tau_12 (c)
 
-    Turb % tau_13 (c)    = (- sgv_xz * du_dx - sgv_x  * dw_dx)  &
-                         + (- sgv_yz * du_dy - sgv_yx * dw_dy)  &
-                         + (- sgv_z  * du_dz - sgv_zx * dw_dz)
-
     Turb % tau_31 (c)    = Turb % tau_13 (c)
-
-    Turb % tau_23 (c)    = (- sgv_xz * dv_dx - sgv_xy * dw_dx)  &
-                         + (- sgv_yz * dv_dy - sgv_y  * dw_dy)  &
-                         + (- sgv_z  * dv_dz - sgv_zy * dw_dz)
 
     Turb % tau_32 (c)    = Turb % tau_23 (c)
 
