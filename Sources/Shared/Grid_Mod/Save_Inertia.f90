@@ -22,16 +22,15 @@
 
   type(Snapshot) :: Snap
       
-    integer :: c = 0 
-    integer :: iunit          
+    integer :: c = 0          
 !==============================================================================!
 
   ! Creation of a .txt file containing the cells' coordinates and the inertia moments
-  open (newunit=iunit, file='Inertia_uns.txt', form='formatted', status='unknown')
+  open (unit=347, file='Inertia_uns.txt', form='formatted', status='unknown')
 
   do c = 1, Grid % n_cells 
   
-	write (iunit, *) Grid % xc(c), &
+	write (347, *)   Grid % xc(c), &
                          Grid % yc(c), &
                          Grid % zc(c), &                    
 		         Grid % ixx(c), &
@@ -43,7 +42,7 @@
                          Grid % vol(c)                                         
   end do
   
-  close (iunit)
+  close (347)
 
   ! Opening of the .txt file created to store the variables in the Snapshot
   allocate(Snap % x_snap(Grid % n_cells));     Snap % x_snap = 0.0
@@ -57,11 +56,11 @@
   allocate(Snap % iyz_snap(Grid % n_cells));   Snap % iyz_snap = 0.0
   allocate(Snap % cv_snap(Grid % n_cells));    Snap % cv_snap = 0.0
   
-  open (newunit=iunit, file='Inertia_uns.txt', form='formatted', status='unknown')
+  open (unit=348, file='Inertia_uns.txt', form='formatted', status='unknown')
 
   do c = 1, Grid % n_cells
                
-  	read (iunit,*)      Snap % x_snap(c), &
+  	read (348,*)        Snap % x_snap(c), &
                             Snap % y_snap(c), &
                             Snap % z_snap(c), &
                             Snap % ixx_snap(c), &
@@ -73,7 +72,7 @@
                             Snap % cv_snap(c)                                                                                                  			       
   end do
   
-  close (iunit, status='delete')
+  close (348, status='delete')
   	
   ! Ordering the cells through their coordinates
   allocate(Snap % pos_ind(Grid % n_cells));  Snap % pos_ind = 0
@@ -96,11 +95,11 @@
   Call Sort % Three_Real_Carry_Int(Snap % x_2, Snap % y_2, Snap % z_2, Snap % pos_ind)
 
   ! Writing the file with ordered cells according to their coordinates
-  open(newunit=iunit,file='Inertia.txt',form='formatted',status='unknown')
+  open(unit=349,file='Inertia.txt',form='formatted',status='unknown')
 
   do c = 1, Grid % n_cells
 
-	write(iunit, *) Snap % x_snap(Snap % pos_ind(c)), ',', &
+	write(349, *)   Snap % x_snap(Snap % pos_ind(c)), ',', &
 		        Snap % y_snap(Snap % pos_ind(c)), ',', &
 		        Snap % z_snap(Snap % pos_ind(c)), ',', &
 		        Snap % ixx_snap(Snap % pos_ind(c)), ',', &
@@ -112,7 +111,7 @@
 		        Snap % cv_snap(Snap % pos_ind(c))
   end do 
   
-  close(iunit)
+  close(349)
 
   deallocate(Snap % x_snap)     
   deallocate(Snap % y_snap)     
