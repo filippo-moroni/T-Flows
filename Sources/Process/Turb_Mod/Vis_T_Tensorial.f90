@@ -74,7 +74,7 @@
                        + Grid % izzp(c)*(dv_dz*du_dz)                &
                        + Grid % ixyp(c)*(dv_dx*du_dy + dv_dy*du_dx)  &
                        + Grid % ixzp(c)*(dv_dx*du_dz + dv_dz*du_dx)  & 
-                       + Grid % iyzp(c)*(dv_dy*du_dz + dv_dz*du_dy)  &
+                       + Grid % iyzp(c)*(dv_dy*du_dz + dv_dz*du_dy)) &
                        /omega
                         
     Turb % tau_13(c) = -(Grid % ixxp(c)*(dw_dx*du_dx)                &
@@ -82,7 +82,7 @@
                        + Grid % izzp(c)*(dw_dz*du_dz)                &
                        + Grid % ixyp(c)*(dw_dx*du_dy + dw_dy*du_dx)  &
                        + Grid % ixzp(c)*(dw_dx*du_dz + dw_dz*du_dx)  &
-                       + Grid % iyzp(c)*(dw_dy*du_dz + dw_dz*du_dy)  &
+                       + Grid % iyzp(c)*(dw_dy*du_dz + dw_dz*du_dy)) &
                        /omega
                         
     Turb % tau_23(c) = -(Grid % ixxp(c)*(dw_dx*dv_dx)                &
@@ -90,7 +90,7 @@
                        + Grid % izzp(c)*(dw_dz*dv_dz)                &
                        + Grid % ixyp(c)*(dw_dx*dv_dy + dw_dy*dv_dx)  &
                        + Grid % ixzp(c)*(dw_dx*dv_dz + dw_dz*dv_dx)  &
-                       + Grid % iyzp(c)*(dw_dy*dv_dz + dw_dz*dv_dy)  &
+                       + Grid % iyzp(c)*(dw_dy*dv_dz + dw_dz*dv_dy)) &
                        /omega
         
   end do
