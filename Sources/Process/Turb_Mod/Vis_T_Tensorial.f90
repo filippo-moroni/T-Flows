@@ -14,8 +14,6 @@
   real                      :: du_dx, du_dy, du_dz
   real                      :: dv_dx, dv_dy, dv_dz
   real                      :: dw_dx, dw_dy, dw_dz
-  real                      :: t11, t22, t33
-  real                      :: t12, t13, t23
   real                      :: omega
 !------------------------------------------------------------------------------!
 !                                                                              !
