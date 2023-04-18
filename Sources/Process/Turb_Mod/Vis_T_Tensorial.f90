@@ -52,7 +52,7 @@
     omega = Grid % vol(c)
     
     ! Diagonal components
-    Turb % tau_11(c) =   -(Grid % ixxp(c)*du_dx*du_dx   &
+    Turb % tau_11(c) =  -( Grid % ixxp(c)*du_dx*du_dx   &
                      +     Grid % iyyp(c)*du_dy*du_dy   &
                      +     Grid % izzp(c)*du_dz*du_dz   &
                      + 2.0*Grid % ixyp(c)*du_dx*du_dy   &
