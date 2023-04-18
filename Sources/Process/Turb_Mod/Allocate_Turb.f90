@@ -582,12 +582,12 @@
     allocate(Turb % p_kin   (-nb:nc));  Turb % p_kin   = 0.
 
     ! Turbulent stress tensor
-    allocate(Turb % tau_11  (-nb:nc));  Turb % tau_11 = 0.0
-    allocate(Turb % tau_22  (-nb:nc));  Turb % tau_22 = 0.0
-    allocate(Turb % tau_33  (-nb:nc));  Turb % tau_33 = 0.0
-    allocate(Turb % tau_12  (-nb:nc));  Turb % tau_12 = 0.0
-    allocate(Turb % tau_13  (-nb:nc));  Turb % tau_13 = 0.0
-    allocate(Turb % tau_23  (-nb:nc));  Turb % tau_23 = 0.0
+    allocate(Turb % tau_11  (-nb:nc));  Turb % tau_11 = 0.
+    allocate(Turb % tau_22  (-nb:nc));  Turb % tau_22 = 0.
+    allocate(Turb % tau_33  (-nb:nc));  Turb % tau_33 = 0.
+    allocate(Turb % tau_12  (-nb:nc));  Turb % tau_12 = 0.
+    allocate(Turb % tau_13  (-nb:nc));  Turb % tau_13 = 0.
+    allocate(Turb % tau_23  (-nb:nc));  Turb % tau_23 = 0.
     
     if(Flow % heat_transfer) then
 
