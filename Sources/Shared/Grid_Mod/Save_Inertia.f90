@@ -31,15 +31,15 @@
 
   do c = 1, Grid % n_cells 
   
-	write (iunit, *) Grid % xc(c) &
-                         Grid % yc(c) &
-                         Grid % zc(c) &                    
-		         Grid % ixx(c) &
-  		         Grid % iyy(c) &
-	                 Grid % izz(c) &
-                         Grid % ixy(c) &
-		         Grid % ixz(c) &
-                         Grid % iyz(c) &
+	write (iunit, *) Grid % xc(c), &
+                         Grid % yc(c), &
+                         Grid % zc(c), &                    
+		         Grid % ixx(c), &
+  		         Grid % iyy(c), &
+	                 Grid % izz(c), &
+                         Grid % ixy(c), &
+		         Grid % ixz(c), &
+                         Grid % iyz(c), &
                          Grid % vol(c)                                         
   end do
   
@@ -61,15 +61,15 @@
 
   do c = 1, Grid % n_cells
                
-  	read (iunit,*)      Snap % x_snap(c) &
-                            Snap % y_snap(c) &
-                            Snap % z_snap(c) &
-                            Snap % ixx_snap(c) &
-                            Snap % iyy_snap(c) &
-                            Snap % izz_snap(c) &
-                            Snap % ixy_snap(c) &
-                            Snap % ixz_snap(c) &
-                            Snap % iyz_snap(c) &
+  	read (iunit,*)      Snap % x_snap(c), &
+                            Snap % y_snap(c), &
+                            Snap % z_snap(c), &
+                            Snap % ixx_snap(c), &
+                            Snap % iyy_snap(c), &
+                            Snap % izz_snap(c), &
+                            Snap % ixy_snap(c), &
+                            Snap % ixz_snap(c), &
+                            Snap % iyz_snap(c), &
                             Snap % cv_snap(c)                                                                                                  			       
   end do
   
