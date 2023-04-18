@@ -27,7 +27,7 @@
 !==============================================================================!
 
   ! Creation of a .txt file containing the cells' coordinates and the inertia moments
-  open (newunit=iunit, file='Inertia_uns.bin', form='unformatted', status='unknown')
+  open (newunit=iunit, file='Inertia_uns.txt', form='formatted', status='unknown')
 
   do c = 1, Grid % n_cells 
   
@@ -57,7 +57,7 @@
   allocate(Snap % iyz_snap(Grid % n_cells));   Snap % iyz_snap = 0.0
   allocate(Snap % cv_snap(Grid % n_cells));    Snap % cv_snap = 0.0
   
-  open (newunit=iunit, file='Inertia_uns.bin', form='unformatted', status='unknown')
+  open (newunit=iunit, file='Inertia_uns.txt', form='formatted', status='unknown')
 
   do c = 1, Grid % n_cells
                
