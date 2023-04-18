@@ -460,7 +460,6 @@
 !------------------------------------------------------------------------------!
 
 ! Get the subgrid viscosity when Smagorinsky or Dynamic Smagorinsky or WALE models are used
-
     kin_vis_t(:) = 0.0
     if(Turb % model .eq. LES_SMAGORINSKY .or.  &
        Turb % model .eq. LES_DYNAMIC .or. &
@@ -469,14 +468,13 @@
     end if
       
 ! Sub-Snapshots creation starts here (one for each processor)   
-  
   if(run .eq. 1 .and. plot_inside) then            					     
   			                                                                              													
-    if (this_proc < 10)                       write (filename, "(A8,I1,A4)") "SnapShot", this_proc, '.txt'		     
-    if (this_proc > 9 .and. this_proc < 100)  write (filename, "(A8,I2,A4)") "SnapShot", this_proc, '.txt'
-    if (this_proc > 99)                       write (filename, "(A8,I3,A4)") "SnapShot", this_proc, '.txt' 
+    if (this_proc < 10)                       write (filename, "(A8,I1,A4)") "SnapShot", this_proc, '.bin'		     
+    if (this_proc > 9 .and. this_proc < 100)  write (filename, "(A8,I2,A4)") "SnapShot", this_proc, '.bin'
+    if (this_proc > 99)                       write (filename, "(A8,I3,A4)") "SnapShot", this_proc, '.bin' 
   
-    open(unit=606+this_proc,file = trim(filename),form='formatted',status='unknown')		     
+    open(unit=606+this_proc,file = trim(filename),form='unformatted',status='unknown')		     
   
     do i = c_f, c_l									             
        
@@ -532,8 +530,7 @@
     
   end if											     
 
-  ! Creation of the total Snapshot
- 			     
+  ! Creation of the total Snapshot			     
   if(run .eq. 2 .and. this_proc .eq. n_proc .and. .not. plot_inside) then	   	             
 												     											
     allocate(Snap % x_snap(n_of_cells));     Snap % x_snap = 0.0					     
@@ -556,11 +553,11 @@
   
     do j = 1, n_proc									             
     
-      if (j < 10)               write (filename, "(A8,I1,A4)") "SnapShot", j, '.txt'				     
-      if (j > 9 .and. j < 100)  write (filename, "(A8,I2,A4)") "SnapShot", j, '.txt'
-      if (j > 99)               write (filename, "(A8,I3,A4)") "SnapShot", j, '.txt'
+      if (j < 10)               write (filename, "(A8,I1,A4)") "SnapShot", j, '.bin'				     
+      if (j > 9 .and. j < 100)  write (filename, "(A8,I2,A4)") "SnapShot", j, '.bin'
+      if (j > 99)               write (filename, "(A8,I3,A4)") "SnapShot", j, '.bin'
   
-      open(unit=606+j,file = trim(filename),form='formatted',status='unknown')			     
+      open(unit=606+j,file = trim(filename),form='unformatted',status='unknown')			     
 
       do
       
@@ -615,8 +612,7 @@
       								      								      								    
     end do
     
-    ! Ordering of the Snapshot according to cells' coordinates											   
-      
+    ! Ordering of the Snapshot according to cells' coordinates											     
     allocate(Snap % pos_ind(n_c_tot));  Snap % pos_ind = 0    
     allocate(Snap % x_2(n_c_tot));      Snap % x_2 = 0.0
     allocate(Snap % y_2(n_c_tot));      Snap % y_2 = 0.0
@@ -639,7 +635,6 @@
   call Sort % Three_Real_Carry_Int(Snap % x_2, Snap % y_2, Snap % z_2, Snap % pos_ind)		          										
     
     ! Creation of the output Snapshot .txt file
-    
     select case(ts)											  
     													     													  
       case (0:9)

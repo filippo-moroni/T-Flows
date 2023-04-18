@@ -13,7 +13,7 @@
   integer, intent(in)         :: curr_dt  ! time step
   real,    intent(in)         :: time     ! physical time
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: tot_iter = 15000		! Maximum number of iterations in a single run, to allocate memory.
+  integer              :: tot_iter = 20000		! Maximum number of iterations in a single run, to allocate memory.
   integer              :: c = 0				! Integer to count the number of rows in the SubSnapshots.
   integer              :: i, j
   

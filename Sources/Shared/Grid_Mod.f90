@@ -62,7 +62,7 @@
     real, allocatable :: ixx(:), iyy(:), izz(:), ixy(:), ixz(:), iyz(:)
     
     ! Cells' modified tensor of inertia I'
-    real, allocatable :: ixp(:), iyp(:), izp(:), ixyp(:), ixzp(:), iyzp(:)  ! to do: add a function to calculate it
+    real, allocatable :: ixxp(:), iyyp(:), izzp(:), ixyp(:), ixzp(:), iyzp(:)  
 
     ! Fractional cell volumes around faces
     real, allocatable :: dv1(:)
@@ -193,6 +193,7 @@
       procedure :: Calculate_Face_Interpolation
       procedure :: Calculate_Face_Surfaces
       procedure :: Calculate_Global_Volumes
+      procedure :: Calculate_Inertia_Prime
       procedure :: Calculate_Wall_Distance
       procedure :: Calculate_Weights_Cells_To_Nodes
       procedure :: Calculate_Weights_Nodes_To_Cells
@@ -250,6 +251,7 @@
 #   include "Grid_Mod/Calculate_Face_Surfaces.f90"
 #   include "Grid_Mod/Calculate_Faces_Surface.f90"
 #   include "Grid_Mod/Calculate_Global_Volumes.f90"
+#   include "Grid_Mod/Calculate_Inertia_Prime.f90"
 #   include "Grid_Mod/Calculate_Wall_Distance.f90"
 #   include "Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90"
 #   include "Grid_Mod/Calculate_Weights_Nodes_To_Cells.f90"

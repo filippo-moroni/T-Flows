@@ -581,28 +581,14 @@
     allocate(Turb % vis_w   (-nb:nc));  Turb % vis_w   = 0.  ! wall visc
     allocate(Turb % p_kin   (-nb:nc));  Turb % p_kin   = 0.
 
-    ! Tensorial turbulent viscosity
-    allocate(Turb % ten_turb_11 (-nb:nc));  Turb % ten_turb_11 = 0.
-    allocate(Turb % ten_turb_12 (-nb:nc));  Turb % ten_turb_12 = 0.
-    allocate(Turb % ten_turb_13 (-nb:nc));  Turb % ten_turb_13 = 0.
-    allocate(Turb % ten_turb_21 (-nb:nc));  Turb % ten_turb_21 = 0.
-    allocate(Turb % ten_turb_22 (-nb:nc));  Turb % ten_turb_22 = 0.
-    allocate(Turb % ten_turb_23 (-nb:nc));  Turb % ten_turb_23 = 0.
-    allocate(Turb % ten_turb_31 (-nb:nc));  Turb % ten_turb_31 = 0.
-    allocate(Turb % ten_turb_32 (-nb:nc));  Turb % ten_turb_32 = 0.
-    allocate(Turb % ten_turb_33 (-nb:nc));  Turb % ten_turb_33 = 0.
-
     ! Turbulent stress tensor
-    allocate(Turb % tau_11      (-nb:nc));  Turb % tau_11      = 0.
-    allocate(Turb % tau_12      (-nb:nc));  Turb % tau_12      = 0.
-    allocate(Turb % tau_13      (-nb:nc));  Turb % tau_13      = 0.
-    allocate(Turb % tau_21      (-nb:nc));  Turb % tau_21      = 0.
-    allocate(Turb % tau_22      (-nb:nc));  Turb % tau_22      = 0.
-    allocate(Turb % tau_23      (-nb:nc));  Turb % tau_23      = 0.
-    allocate(Turb % tau_31      (-nb:nc));  Turb % tau_31      = 0.
-    allocate(Turb % tau_32      (-nb:nc));  Turb % tau_32      = 0.
-    allocate(Turb % tau_33      (-nb:nc));  Turb % tau_33      = 0.
-
+    allocate(Turb % tau_11  (-nb:nc));  Turb % tau_11 = 0.
+    allocate(Turb % tau_22  (-nb:nc));  Turb % tau_22 = 0.
+    allocate(Turb % tau_33  (-nb:nc));  Turb % tau_33 = 0.
+    allocate(Turb % tau_12  (-nb:nc));  Turb % tau_12 = 0.
+    allocate(Turb % tau_13  (-nb:nc));  Turb % tau_13 = 0.
+    allocate(Turb % tau_23  (-nb:nc));  Turb % tau_23 = 0.
+    
     if(Flow % heat_transfer) then
 
       call Var_Mod_Allocate_New_Only(Turb % ut, Grid, 'UT')
