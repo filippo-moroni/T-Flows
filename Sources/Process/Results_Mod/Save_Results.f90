@@ -484,41 +484,41 @@
        		Turb % model .eq. LES_DYNAMIC .or. &
 		Turb % model .eq. LES_WALE) then
              
-        	write (606+this_proc, *) Grid % xc(i) &		 			               
-                                 	 Grid % yc(i) &		                                       
-        				 Grid % zc(i) &		                                       
-        			 	 Flow % u % n(i) &		                                    
-        			 	 Flow % v % n(i) &		                                      
-        			 	 Flow % w % n(i) &		                                     
-        			 	 Flow % p % n(i) &
-        			 	 Flow % u % x(i) &		     
-        				 Flow % u % y(i) &		      
-        				 Flow % u % z(i) &		    
-        				 Flow % v % x(i) &		      
-        				 Flow % v % y(i) &		   
-        				 Flow % v % z(i) &		      
-        				 Flow % w % x(i) &		     
-        				 Flow % w % y(i) &		    
-        				 Flow % w % z(i) &
+        	write (606+this_proc, *) Grid % xc(i), &		 			               
+                                 	 Grid % yc(i), &		                                       
+        				 Grid % zc(i), &		                                       
+        			 	 Flow % u % n(i), &		                                    
+        			 	 Flow % v % n(i), &		                                      
+        			 	 Flow % w % n(i), &		                                     
+        			 	 Flow % p % n(i), &
+        			 	 Flow % u % x(i), &		     
+        				 Flow % u % y(i), &		      
+        				 Flow % u % z(i), &		    
+        				 Flow % v % x(i), &		      
+        				 Flow % v % y(i), &		   
+        				 Flow % v % z(i), &		      
+        				 Flow % w % x(i), &		     
+        				 Flow % w % y(i), &		    
+        				 Flow % w % z(i), &
         				 kin_vis_t(i)		           			 	 
         			 	 
              else
         			 	 
-        	write (606+this_proc, *) Grid % xc(i) &		 			               
-                                 	 Grid % yc(i) &		                                       
-        				 Grid % zc(i) &		                                       
-        			 	 Flow % u % n(i) &		                                    
-        			 	 Flow % v % n(i) &		                                      
-        			 	 Flow % w % n(i) &		                                     
-        			 	 Flow % p % n(i) &
-              			 	 Flow % u % x(i) &		     
-        				 Flow % u % y(i) &		      
-        				 Flow % u % z(i) &		    
-        				 Flow % v % x(i) &		      
-        				 Flow % v % y(i) &		   
-        				 Flow % v % z(i) &		      
-        				 Flow % w % x(i) &		     
-        				 Flow % w % y(i) &		    
+        	write (606+this_proc, *) Grid % xc(i), &		 			               
+                                 	 Grid % yc(i), &		                                       
+        				 Grid % zc(i), &		                                       
+        			 	 Flow % u % n(i), &		                                    
+        			 	 Flow % v % n(i), &		                                      
+        			 	 Flow % w % n(i), &		                                     
+        			 	 Flow % p % n(i), &
+              			 	 Flow % u % x(i), &		     
+        				 Flow % u % y(i), &		      
+        				 Flow % u % z(i), &		    
+        				 Flow % v % x(i), &		      
+        				 Flow % v % y(i), &		   
+        				 Flow % v % z(i), &		      
+        				 Flow % w % x(i), &		     
+        				 Flow % w % y(i), &		    
         				 Flow % w % z(i)
         				       			 
              end if
@@ -565,41 +565,41 @@
       	   Turb % model .eq. LES_DYNAMIC .or. &
 	   Turb % model .eq. LES_WALE) then                                                          
       					
-	    	read (606+j,*, end=10)  Snap % x_snap(n_c_tot+1) &				             
-				   	Snap % y_snap(n_c_tot+1) &				             
-				   	Snap % z_snap(n_c_tot+1) &				             
-				   	Snap % u_snap(n_c_tot+1) &				             
-				   	Snap % v_snap(n_c_tot+1) &					     
-				   	Snap % w_snap(n_c_tot+1) &				             
-				   	Snap % p_snap(n_c_tot+1) &
-				        Snap % dudx_snap(n_c_tot+1) &					     
-				   	Snap % dudy_snap(n_c_tot+1) &					 
-				   	Snap % dudz_snap(n_c_tot+1) &					   
-				   	Snap % dvdx_snap(n_c_tot+1) &					     
-				   	Snap % dvdy_snap(n_c_tot+1) &					      
-				   	Snap % dvdz_snap(n_c_tot+1) &					   
-				   	Snap % dwdx_snap(n_c_tot+1) &					      
-				   	Snap % dwdy_snap(n_c_tot+1) &					   
-				   	Snap % dwdz_snap(n_c_tot+1) &				   	
+	    	read (606+j,*, end=10)  Snap % x_snap(n_c_tot+1), &				             
+				   	Snap % y_snap(n_c_tot+1), &				             
+				   	Snap % z_snap(n_c_tot+1), &				             
+				   	Snap % u_snap(n_c_tot+1), &				             
+				   	Snap % v_snap(n_c_tot+1), &					     
+				   	Snap % w_snap(n_c_tot+1), &				             
+				   	Snap % p_snap(n_c_tot+1), &
+				        Snap % dudx_snap(n_c_tot+1), &					     
+				   	Snap % dudy_snap(n_c_tot+1), &					 
+				   	Snap % dudz_snap(n_c_tot+1), &					   
+				   	Snap % dvdx_snap(n_c_tot+1), &					     
+				   	Snap % dvdy_snap(n_c_tot+1), &					      
+				   	Snap % dvdz_snap(n_c_tot+1), &					   
+				   	Snap % dwdx_snap(n_c_tot+1), &					      
+				   	Snap % dwdy_snap(n_c_tot+1), &					   
+				   	Snap % dwdz_snap(n_c_tot+1), &				   	
 				   	Snap % ni_turb(n_c_tot+1)
 				   
 	    else
 	    
-	    	read (606+j,*, end=10)  Snap % x_snap(n_c_tot+1) &				             
-				   	Snap % y_snap(n_c_tot+1) &				             
-				   	Snap % z_snap(n_c_tot+1) &				             
-				   	Snap % u_snap(n_c_tot+1) &				             
-				   	Snap % v_snap(n_c_tot+1) &					     
-				   	Snap % w_snap(n_c_tot+1) &				             
-				   	Snap % p_snap(n_c_tot+1) &
-				        Snap % dudx_snap(n_c_tot+1) &					     
-				   	Snap % dudy_snap(n_c_tot+1) &					 
-				   	Snap % dudz_snap(n_c_tot+1) &					   
-				   	Snap % dvdx_snap(n_c_tot+1) &					     
-				   	Snap % dvdy_snap(n_c_tot+1) &					      
-				   	Snap % dvdz_snap(n_c_tot+1) &					   
-				   	Snap % dwdx_snap(n_c_tot+1) &					      
-				   	Snap % dwdy_snap(n_c_tot+1) &					   
+	    	read (606+j,*, end=10)  Snap % x_snap(n_c_tot+1), &				             
+				   	Snap % y_snap(n_c_tot+1), &				             
+				   	Snap % z_snap(n_c_tot+1), &				             
+				   	Snap % u_snap(n_c_tot+1), &				             
+				   	Snap % v_snap(n_c_tot+1), &					     
+				   	Snap % w_snap(n_c_tot+1), &				             
+				   	Snap % p_snap(n_c_tot+1), &
+				        Snap % dudx_snap(n_c_tot+1), &					     
+				   	Snap % dudy_snap(n_c_tot+1), &					 
+				   	Snap % dudz_snap(n_c_tot+1), &					   
+				   	Snap % dvdx_snap(n_c_tot+1), &					     
+				   	Snap % dvdy_snap(n_c_tot+1), &					      
+				   	Snap % dvdz_snap(n_c_tot+1), &					   
+				   	Snap % dwdx_snap(n_c_tot+1), &					      
+				   	Snap % dwdy_snap(n_c_tot+1), &					   
 				   	Snap % dwdz_snap(n_c_tot+1)			   
 				   
             end if	   
