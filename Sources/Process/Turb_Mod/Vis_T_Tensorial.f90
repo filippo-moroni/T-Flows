@@ -25,7 +25,15 @@
   Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
-
+  
+  ! Initialize
+  Turb % tau_11 = 0.0
+  Turb % tau_22 = 0.0
+  Turb % tau_33 = 0.0
+  Turb % tau_12 = 0.0
+  Turb % tau_13 = 0.0
+  Turb % tau_23 = 0.0
+  
   ! Cycle through all cells
   do c = 1, Grid % n_cells
   
