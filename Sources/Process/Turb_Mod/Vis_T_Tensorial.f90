@@ -40,11 +40,11 @@
     dw_dy = w % y(c)  ! dW/dy
     dw_dz = w % z(c)  ! dW/dz
     
-    ! Take alias for grid element volume
-    omega = Grid % vol(c)
+    ! Take alias for grid element volume, with minus sign
+    omega = - Grid % vol(c)
     
     ! Diagonal components
-    Turb % tau_11(c) =   -(Grid % ixxp(c)*du_dx*du_dx   &
+    Turb % tau_11(c) =    (Grid % ixxp(c)*du_dx*du_dx   &
                      +     Grid % iyyp(c)*du_dy*du_dy   &
                      +     Grid % izzp(c)*du_dz*du_dz   &
                      + 2.0*Grid % ixyp(c)*du_dx*du_dy   &
@@ -52,7 +52,7 @@
                      + 2.0*Grid % iyzp(c)*du_dy*du_dz)  &
                      /omega
                            
-    Turb % tau_22(c) =   -(Grid % ixxp(c)*dv_dx*dv_dx   &
+    Turb % tau_22(c) =    (Grid % ixxp(c)*dv_dx*dv_dx   &
                      +     Grid % iyyp(c)*dv_dy*dv_dy   &
                      +     Grid % izzp(c)*dv_dz*dv_dz   &
                      + 2.0*Grid % ixyp(c)*dv_dx*dv_dy   & 
@@ -60,7 +60,7 @@
                      + 2.0*Grid % iyzp(c)*dv_dy*dv_dz)  &
                      /omega
                         
-    Turb % tau_33(c) =   -(Grid % ixxp(c)*dw_dx*dw_dx   &
+    Turb % tau_33(c) =    (Grid % ixxp(c)*dw_dx*dw_dx   &
                      +     Grid % iyyp(c)*dw_dy*dw_dy   &
                      +     Grid % izzp(c)*dw_dz*dw_dz   &
                      + 2.0*Grid % ixyp(c)*dw_dx*dw_dy   &
@@ -69,7 +69,7 @@
                      /omega
                          
     ! Deviatoric components
-    Turb % tau_12(c) = -(Grid % ixxp(c)*(dv_dx*du_dx)                &
+    Turb % tau_12(c) =  (Grid % ixxp(c)*(dv_dx*du_dx)                &
                        + Grid % iyyp(c)*(dv_dy*du_dy)                &
                        + Grid % izzp(c)*(dv_dz*du_dz)                &
                        + Grid % ixyp(c)*(dv_dx*du_dy + dv_dy*du_dx)  &
@@ -77,7 +77,7 @@
                        + Grid % iyzp(c)*(dv_dy*du_dz + dv_dz*du_dy)) &
                        /omega
                         
-    Turb % tau_13(c) = -(Grid % ixxp(c)*(dw_dx*du_dx)                &
+    Turb % tau_13(c) =  (Grid % ixxp(c)*(dw_dx*du_dx)                &
                        + Grid % iyyp(c)*(dw_dy*du_dy)                &
                        + Grid % izzp(c)*(dw_dz*du_dz)                &
                        + Grid % ixyp(c)*(dw_dx*du_dy + dw_dy*du_dx)  &
@@ -85,7 +85,7 @@
                        + Grid % iyzp(c)*(dw_dy*du_dz + dw_dz*du_dy)) &
                        /omega
                         
-    Turb % tau_23(c) = -(Grid % ixxp(c)*(dw_dx*dv_dx)                &
+    Turb % tau_23(c) =  (Grid % ixxp(c)*(dw_dx*dv_dx)                &
                        + Grid % iyyp(c)*(dw_dy*dv_dy)                &
                        + Grid % izzp(c)*(dw_dz*dv_dz)                &
                        + Grid % ixyp(c)*(dw_dx*dv_dy + dw_dy*dv_dx)  &
