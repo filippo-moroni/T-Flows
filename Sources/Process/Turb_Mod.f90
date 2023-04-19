@@ -84,9 +84,15 @@
     ! Turbulent viscosity
     real, allocatable :: vis_t(:) ! [kg/(m s)]
 
+    ! Tensorial turbulent viscosity (for LES_TVM)
+    real, allocatable :: ten_turb_11(:), ten_turb_12(:), ten_turb_13(:)
+    real, allocatable :: ten_turb_21(:), ten_turb_22(:), ten_turb_23(:)
+    real, allocatable :: ten_turb_31(:), ten_turb_32(:), ten_turb_33(:)
+
     ! Turbulent stress tensor (for LES_TVM)
-    real, allocatable :: tau_11(:), tau_22(:), tau_33(:)
-    real, allocatable :: tau_12(:), tau_13(:), tau_23(:)
+    real, allocatable :: tau_11(:), tau_12(:), tau_13(:)
+    real, allocatable :: tau_21(:), tau_22(:), tau_23(:)
+    real, allocatable :: tau_31(:), tau_32(:), tau_33(:)
 
     ! Effective turbulent viscosity
     real, allocatable :: vis_t_eff(:) ! [kg/(m s)]
