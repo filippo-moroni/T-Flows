@@ -85,22 +85,6 @@
     end do
   end do
   
-  !--------------------------------!
-  !   Cell inertia prime tensors   !
-  !--------------------------------!
-  do var = 1, 6
-    do c = 1, Grid % n_cells
-      if(Grid % old_c(c) .ne. 0 .or. c .eq. 0) then
-        if(var .eq. 1) write(fu) Grid % ixxp(Grid % old_c(c))
-        if(var .eq. 2) write(fu) Grid % iyyp(Grid % old_c(c))
-        if(var .eq. 3) write(fu) Grid % izzp(Grid % old_c(c))
-        if(var .eq. 4) write(fu) Grid % ixyp(Grid % old_c(c))
-        if(var .eq. 5) write(fu) Grid % ixzp(Grid % old_c(c))
-        if(var .eq. 6) write(fu) Grid % iyzp(Grid % old_c(c))
-      end if
-    end do
-  end do
-
   !-----------!
   !   Faces   !
   !-----------!
