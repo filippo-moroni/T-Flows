@@ -66,14 +66,7 @@
   read(fu) (Grid % ixy(c), c = 1, Grid % n_cells)
   read(fu) (Grid % ixz(c), c = 1, Grid % n_cells)
   read(fu) (Grid % iyz(c), c = 1, Grid % n_cells)
-  
-  read(fu) (Grid % ixxp(c), c = 1, Grid % n_cells)
-  read(fu) (Grid % iyyp(c), c = 1, Grid % n_cells)
-  read(fu) (Grid % izzp(c), c = 1, Grid % n_cells)
-  read(fu) (Grid % ixyp(c), c = 1, Grid % n_cells)
-  read(fu) (Grid % ixzp(c), c = 1, Grid % n_cells)
-  read(fu) (Grid % iyzp(c), c = 1, Grid % n_cells)
-  
+    
   read(fu) (Grid % sx(s), s = 1, Grid % n_faces + Grid % n_shadows)
   read(fu) (Grid % sy(s), s = 1, Grid % n_faces + Grid % n_shadows)
   read(fu) (Grid % sz(s), s = 1, Grid % n_faces + Grid % n_shadows)
