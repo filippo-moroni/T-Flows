@@ -919,6 +919,7 @@
     !-----------------!
     !   Q-criterion   !
     !-----------------!
+    call Calculate_Shear_And_Vorticity(Flow)
     phi_save(:) = 0.0
     do c1 = c_f, c_l
       phi_save(c1) = (Flow % vort(c1)**2 - Flow % shear(c1)**2)/4.
