@@ -568,10 +568,11 @@
 
   end if ! LES_DYNAMIC
 
-  !-------------------------------!
-  !   Tensorial viscosity model   !
-  !-------------------------------!
-  if(Turb % model .eq. LES_TVM) then
+  !--------------------------------------------------!
+  !   Tensorial viscosity model and damped version   !
+  !--------------------------------------------------!
+  if(Turb % model .eq. LES_TVM .or. &
+     Turb % model .eq. LES_TVM_DAMPED) then
 
     ! Variables such as time scale, length scale and production
     allocate(Turb % t_scale (-nb:nc));  Turb % t_scale = 0.
@@ -641,7 +642,7 @@
 
     end if ! Turb % statistics
 
-  end if ! LES_TVM
+  end if ! LES_TVM & LES_TVM_DAMPED
 
   !---------------------------------!
   !   Direct numerical simulation   !
