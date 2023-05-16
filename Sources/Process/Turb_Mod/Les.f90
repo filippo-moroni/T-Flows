@@ -25,7 +25,7 @@
   else if(Turb % model .eq. LES_TVM) then
     Les = .true.
     return
-  else if(Turb % model .eq. LES_TVM_DF) then
+  else if(Turb % model .eq. LES_TVM_DAMPED) then
     Les = .true.
     return    
   end if
