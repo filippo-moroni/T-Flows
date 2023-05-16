@@ -191,6 +191,7 @@
       procedure, private :: Vis_T_Spalart_Allmaras
       procedure, private :: Vis_T_Wale
       procedure, private :: Vis_T_Tensorial
+      procedure, private :: Vis_T_Tensorial_Damped
 
       procedure, private :: Ebf_Momentum
       procedure, private :: Ebf_Scalar
@@ -214,7 +215,7 @@
   integer, parameter :: LES_DYNAMIC           = 30047
   integer, parameter :: LES_WALE              = 30059
   integer, parameter :: LES_TVM               = 30071
-  integer, parameter :: LES_TVM_DF            = 30089
+  integer, parameter :: LES_TVM_DAMPED        = 30089
   integer, parameter :: K_EPS                 = 30091
   integer, parameter :: K_EPS_ZETA_F          = 30097
   integer, parameter :: DES_SPALART           = 30103
@@ -331,6 +332,8 @@
 #   include "Turb_Mod/Vis_T_Spalart_Allmaras.f90"
 #   include "Turb_Mod/Vis_T_Wale.f90"
 #   include "Turb_Mod/Vis_T_Tensorial.f90"
+#   include "Turb_Mod/Vis_T_Tensorial_Damped.f90"
+
 
     ! Other subroutines ellipitic blending, turbulent Prandtl number
 #   include "Turb_Mod/Ebf_Momentum.f90"
