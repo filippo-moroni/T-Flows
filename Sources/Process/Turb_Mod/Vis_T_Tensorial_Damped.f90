@@ -22,7 +22,6 @@
   real                      :: sgv_x , sgv_y , sgv_z
   real                      :: sgv_xy, sgv_yx, sgv_xz
   real                      :: sgv_zx, sgv_yz, sgv_zy
-  
   real                      :: nu, dely, u_tan, u_tau, dc
 !------------------------------------------------------------------------------!
 !                                                                              !
