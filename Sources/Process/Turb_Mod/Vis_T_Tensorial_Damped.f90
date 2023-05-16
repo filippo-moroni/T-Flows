@@ -7,6 +7,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: A_POW = 8.3
+  integer, parameter :: B_POW = 1.0/7.0
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -19,6 +22,8 @@
   real                      :: sgv_x , sgv_y , sgv_z
   real                      :: sgv_xy, sgv_yx, sgv_xz
   real                      :: sgv_zx, sgv_yz, sgv_zy
+  
+  real                      :: nu, dely, u_tan, u_tau, dc
 !------------------------------------------------------------------------------!
 !                                                                              !
 !   nii_ki = (1/2*Vol) * I'_kh * dUi/dxh                                       !
@@ -104,7 +109,7 @@
                                                      + iyzp * dv_dy  &
                                                      + izp  * dv_dz )
 
-    ! Since we're at it, we may as well construct the subgrid stress tensor too
+    ! Aliases for tensorial viscosity
     sgv_x  = Turb % ten_turb_11 (c)
     sgv_y  = Turb % ten_turb_22 (c)
     sgv_z  = Turb % ten_turb_33 (c)
@@ -114,43 +119,62 @@
     sgv_zx = Turb % ten_turb_31 (c)
     sgv_yz = Turb % ten_turb_23 (c)
     sgv_zy = Turb % ten_turb_32 (c)
+    
+    !------------------------!
+    !   Van Driest damping   !
+    !------------------------!
+    
+    ! Kinematic viscosity, cell wall distance and tangential velocity
+    nu   = Flow % viscosity(c) / Flow % density(c)
+    dely = Grid % wall_dist(c)
+    u_tan = sqrt(u % n(c)**2 + v % n(c)**2 + w % n(c)**2)
+    
+    ! Friction velocity and y+ 
+    u_tau = (u_tan/A_POW * (nu/dely)**B_POW) ** (1.0/(1.0+B_POW))
+    Turb % y_plus(c) = Grid % wall_dist(c) * u_tau / Flow % viscosity(c)
+    
+    ! Damping coefficient
+    dc = (1.0 - exp(-Turb % y_plus(c) / 25.0))
 
-    ! Now actually build the thing
-    Turb % tau_11 (c)    = (- sgv_x  * du_dx - sgv_x  * du_dx)  &
-                         + (- sgv_yx * du_dy - sgv_yx * du_dy)  &
-                         + (- sgv_zx * du_dz - sgv_zx * du_dz)
+    !----------------------!
+    !   Subgrid stresses   !
+    !----------------------!
+    
+    Turb % tau_11 (c)    = ((- sgv_x  * du_dx - sgv_x  * du_dx)     &
+                         +  (- sgv_yx * du_dy - sgv_yx * du_dy)     &
+                         +  (- sgv_zx * du_dz - sgv_zx * du_dz))*dc
 
-    Turb % tau_22 (c)    = (- sgv_xy * dv_dx - sgv_xy * dv_dx)  &
-                         + (- sgv_y  * dv_dy - sgv_y  * dv_dy)  &
-                         + (- sgv_zy * dv_dz - sgv_zy * dv_dz)
+    Turb % tau_22 (c)    = ((- sgv_xy * dv_dx - sgv_xy * dv_dx)     &
+                         +  (- sgv_y  * dv_dy - sgv_y  * dv_dy)     &
+                         +  (- sgv_zy * dv_dz - sgv_zy * dv_dz))*dc
 
-    Turb % tau_33 (c)    = (- sgv_xz * dw_dx - sgv_xz * dw_dx)  &
-                         + (- sgv_yz * dw_dy - sgv_yz * dw_dy)  &
-                         + (- sgv_z  * dw_dz - sgv_z  * dw_dz)
+    Turb % tau_33 (c)    = ((- sgv_xz * dw_dx - sgv_xz * dw_dx)     &
+                         +  (- sgv_yz * dw_dy - sgv_yz * dw_dy)     &
+                         +  (- sgv_z  * dw_dz - sgv_z  * dw_dz))*dc
 
-    Turb % tau_12 (c)    = (- sgv_xy * du_dx - sgv_x  * dv_dx)  &
-                         + (- sgv_y  * du_dy - sgv_yx * dv_dy)  &
-                         + (- sgv_zy * du_dz - sgv_zx * dv_dz)
+    Turb % tau_12 (c)    = ((- sgv_xy * du_dx - sgv_x  * dv_dx)     &
+                         +  (- sgv_y  * du_dy - sgv_yx * dv_dy)     &
+                         +  (- sgv_zy * du_dz - sgv_zx * dv_dz))*dc
 
-    Turb % tau_21 (c)    = (- sgv_x  * dv_dx - sgv_xy * du_dx)  &
-                         + (- sgv_yx * dv_dy - sgv_y  * du_dy)  &
-                         + (- sgv_zx * dv_dz - sgv_zy * du_dz)
+    Turb % tau_21 (c)    = ((- sgv_x  * dv_dx - sgv_xy * du_dx)     &
+                         +  (- sgv_yx * dv_dy - sgv_y  * du_dy)     &
+                         +  (- sgv_zx * dv_dz - sgv_zy * du_dz)*dc
 
-    Turb % tau_13 (c)    = (- sgv_xz * du_dx - sgv_x  * dw_dx)  &
-                         + (- sgv_yz * du_dy - sgv_yx * dw_dy)  &
-                         + (- sgv_z  * du_dz - sgv_zx * dw_dz)
+    Turb % tau_13 (c)    = ((- sgv_xz * du_dx - sgv_x  * dw_dx)     &
+                         +  (- sgv_yz * du_dy - sgv_yx * dw_dy)     &
+                         +  (- sgv_z  * du_dz - sgv_zx * dw_dz))*dc
 
-    Turb % tau_31 (c)    = (- sgv_x  * dw_dx - sgv_xz * du_dx)  &
-                         + (- sgv_yx * dw_dy - sgv_yz * du_dy)  &
-                         + (- sgv_zx * dw_dz - sgv_z  * du_dz)
+    Turb % tau_31 (c)    = ((- sgv_x  * dw_dx - sgv_xz * du_dx)     &
+                         +  (- sgv_yx * dw_dy - sgv_yz * du_dy)     &
+                         +  (- sgv_zx * dw_dz - sgv_z  * du_dz))*dc
 
-    Turb % tau_23 (c)    = (- sgv_xz * dv_dx - sgv_xy * dw_dx)  &
-                         + (- sgv_yz * dv_dy - sgv_y  * dw_dy)  &
-                         + (- sgv_z  * dv_dz - sgv_zy * dw_dz)
+    Turb % tau_23 (c)    = ((- sgv_xz * dv_dx - sgv_xy * dw_dx)     &
+                         +  (- sgv_yz * dv_dy - sgv_y  * dw_dy)     &
+                         +  (- sgv_z  * dv_dz - sgv_zy * dw_dz))*dc
 
-    Turb % tau_32 (c)    = (- sgv_xy * dw_dx - sgv_xz * dv_dx)  &
-                         + (- sgv_y  * dw_dy - sgv_yz * dv_dy)  &
-                         + (- sgv_zy * dw_dz - sgv_z  * dv_dz)
+    Turb % tau_32 (c)    = ((- sgv_xy * dw_dx - sgv_xz * dv_dx)     &
+                         +  (- sgv_y  * dw_dy - sgv_yz * dv_dy)     &
+                         +  (- sgv_zy * dw_dz - sgv_z  * dv_dz))*dc
 
   end do
 
