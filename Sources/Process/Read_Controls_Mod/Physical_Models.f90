@@ -98,6 +98,9 @@
       Turb % model = HYBRID_LES_RANS
     case('LES_TVM')
       Turb % model = LES_TVM
+    case('LES_TVM_DAMPED')
+      Turb % model = LES_TVM_DAMPED
+      
 
     case default
       if(this_proc < 2) then
