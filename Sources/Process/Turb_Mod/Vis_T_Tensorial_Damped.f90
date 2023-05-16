@@ -157,7 +157,7 @@
 
     Turb % tau_21 (c)    = ((- sgv_x  * dv_dx - sgv_xy * du_dx)     &
                          +  (- sgv_yx * dv_dy - sgv_y  * du_dy)     &
-                         +  (- sgv_zx * dv_dz - sgv_zy * du_dz)*dc
+                         +  (- sgv_zx * dv_dz - sgv_zy * du_dz))*dc
 
     Turb % tau_13 (c)    = ((- sgv_xz * du_dx - sgv_x  * dw_dx)     &
                          +  (- sgv_yz * du_dy - sgv_yx * dw_dy)     &
