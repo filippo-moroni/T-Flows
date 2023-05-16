@@ -39,8 +39,9 @@
     call Calculate_Shear_And_Vorticity(Flow)
   end if
   
-  if(Turb % model .eq. LES_TVM_DF) then
-    call Turb % Vis_T_Tensorial()
+  if(Turb % model .eq. LES_TVM_DAMPED) then
+    call Turb % Vis_T_Tensorial_Damped()
+    call Calculate_Shear_And_Vorticity(Flow)    
   end if  
 
   if(Turb % model .eq. HYBRID_LES_RANS) then
