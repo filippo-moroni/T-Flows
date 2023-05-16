@@ -54,7 +54,8 @@
     end if
   end if
 ! Add influence of tensorial stresses
-  if(Turb % model .eq. LES_TVM) then
+  if(Turb % model .eq. LES_TVM .or. &
+     Turb % model .eq. LES_TVM_DAMPED) then
 
     if(ui % name .eq. 'U') then
       tau_k1 =      Grid % fw(s)  * Turb % tau_11(c1)  &
